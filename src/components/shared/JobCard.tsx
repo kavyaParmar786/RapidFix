@@ -9,11 +9,14 @@ import { cn, getCategoryConfig, STATUS_CONFIG, URGENCY_CONFIG, formatRelativeTim
 interface JobCardProps {
   job: Job
   showAccept?: boolean
+  viewAs?: 'worker' | 'customer'
   onAccept?: (jobId: string) => void
   accepting?: boolean
 }
 
-export default function JobCard({ job, showAccept, onAccept, accepting }: JobCardProps) {
+export default function JobCard({ job, showAccept, viewAs, onAccept, accepting }: JobCardProps) {
+  // viewAs='worker' with onAccept behaves like showAccept=true
+  const canAccept = showAccept || (viewAs === 'worker' && !!onAccept)
   const cat = getCategoryConfig(job.category)
   const status = STATUS_CONFIG[job.status]
   const urgency = URGENCY_CONFIG[job.urgency]
@@ -101,7 +104,7 @@ export default function JobCard({ job, showAccept, onAccept, accepting }: JobCar
           <span className="text-xs text-white/60">{job.customerName}</span>
         </div>
 
-        {showAccept && job.status === 'posted' && (
+        {canAccept && job.status === 'posted' && (
           <button
             onClick={() => onAccept?.(job.id)}
             disabled={accepting}
