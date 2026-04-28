@@ -103,7 +103,7 @@ export default function WorkerDashboard() {
           {/* Stats */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             {[
-              { icon: Briefcase, label: 'Available Jobs', value: stats.available, color: 'text-indigo-400', bg: 'from-indigo-500/20 to-indigo-600/10' },
+              { icon: Briefcase, label: 'Browse Jobs', value: '→', color: 'text-indigo-400', bg: 'from-indigo-500/20 to-indigo-600/10' },
               { icon: CheckCircle, label: 'Active', value: stats.active, color: 'text-yellow-400', bg: 'from-yellow-500/20 to-yellow-600/10' },
               { icon: CheckCircle, label: 'Completed', value: stats.completed, color: 'text-green-400', bg: 'from-green-500/20 to-green-600/10' },
               { icon: Star, label: 'Rating', value: stats.rating || '—', color: 'text-amber-400', bg: 'from-amber-500/20 to-amber-600/10' },
