@@ -90,7 +90,7 @@ export default function BrowseJobsPage() {
                         : 'bg-white/[0.04] text-white/50 hover:text-white hover:bg-white/[0.08] border border-white/[0.08]'
                     )}
                   >
-                    {cat === 'all' ? 'All' : CATEGORIES[cat as JobCategory]?.label || cat}
+                    {cat === 'all' ? 'All' : cat.replace('_', ' ')}
                   </button>
                 ))}
               </div>
