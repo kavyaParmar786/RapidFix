@@ -5,18 +5,18 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useAuth } from '@/lib/auth-context'
-import { useTheme, ThemeMode } from '@/lib/theme-context'
 import {
   Bell, Menu, X, LogOut, User, LayoutDashboard,
   ChevronDown, Zap, Droplets, Hammer, PaintBucket,
   Wind, Settings2, Bug, Shield, Sparkles,
-  Settings, Sun, Moon, Clock,
+  Settings,
   Share2, Copy, Check
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { subscribeToNotifications } from '@/lib/firestore'
 import { Notification } from '@/types'
+import { ThemeTogglerButton } from '@/components/animate-ui/components/buttons/theme-toggler'
 
 const SERVICES = [
   { label: 'Electrician', icon: Zap, href: '/services/electrician', desc: 'Wiring, fuse, lights' },
@@ -90,23 +90,7 @@ function ShareButton() {
 }
 
 function ThemeToggle() {
-  const { mode, setMode } = useTheme()
-  const modes: { key: ThemeMode; icon: React.ReactNode; label: string }[] = [
-    { key: 'light', icon: <Sun size={13} />, label: 'Light' },
-    { key: 'dark', icon: <Moon size={13} />, label: 'Dark' },
-    { key: 'dynamic', icon: <Clock size={13} />, label: 'Auto' },
-  ]
-  return (
-    <div className="flex items-center gap-0.5 rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] p-0.5">
-      {modes.map(({ key, icon, label }) => (
-        <motion.button key={key} onClick={() => setMode(key)} whileTap={{ scale: 0.93 }}
-          className={cn('flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium transition-all duration-150',
-            mode === key ? 'bg-[var(--bg-base)] text-[var(--text-primary)] shadow-sm' : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]')}>
-          {icon} {label}
-        </motion.button>
-      ))}
-    </div>
-  )
+  return <ThemeTogglerButton modes={['light', 'dark', 'dynamic']} size="sm" />
 }
 
 function SettingsPanel({ onClose }: { onClose: () => void }) {
