@@ -4,6 +4,7 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Light theme (default) ── */
 :root {
   --bg-base: #ffffff;
   --bg-surface: #fafafa;
@@ -24,6 +25,25 @@
   --font-sans: 'Inter', system-ui, sans-serif;
 }
 
+/* ── Dark theme ── */
+.dark {
+  --bg-base: #09090b;
+  --bg-surface: #111113;
+  --bg-elevated: #1c1c1f;
+  --bg-overlay: #27272a;
+
+  --border-subtle: rgba(255,255,255,0.06);
+  --border-default: rgba(255,255,255,0.1);
+  --border-strong: rgba(255,255,255,0.22);
+
+  --text-primary: #fafafa;
+  --text-secondary: #a1a1aa;
+  --text-muted: #52525b;
+
+  --accent: #fafafa;
+  --accent-dim: rgba(255,255,255,0.06);
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 
@@ -33,85 +53,61 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-::selection { background: rgba(0,0,0,0.1); }
+::selection { background: rgba(0,0,0,0.12); }
+.dark ::selection { background: rgba(255,255,255,0.15); }
 
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 99px; }
+.dark ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); }
 
 @layer components {
   .glass-card {
     @apply rounded-2xl;
-    background: #ffffff;
-    border: 1px solid rgba(0,0,0,0.08);
+    background: var(--bg-base);
+    border: 1px solid var(--border-default);
     box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium text-white transition-all duration-150 select-none;
-    background: #18181b;
+    @apply inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-all duration-150 select-none relative overflow-hidden;
+    background: var(--accent);
+    color: var(--bg-base);
   }
-  .btn-primary:hover { background: #27272a; }
-  .btn-primary:active { background: #3f3f46; transform: scale(0.98); }
+  .dark .btn-primary { background: #fafafa; color: #09090b; }
+  .btn-primary:hover { opacity: 0.88; }
+  .btn-primary:active { transform: scale(0.98); }
   .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
 
   .btn-ghost {
     @apply inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-all duration-150 select-none;
-    color: #3f3f46;
+    color: var(--text-secondary);
     background: transparent;
-    border: 1px solid rgba(0,0,0,0.1);
+    border: 1px solid var(--border-default);
   }
-  .btn-ghost:hover { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.18); color: #18181b; }
+  .btn-ghost:hover { background: var(--bg-elevated); color: var(--text-primary); }
 
   .input-base {
     @apply w-full rounded-lg px-3 py-2.5 text-sm outline-none transition-all duration-150;
-    color: #09090b;
-    background: #ffffff;
-    border: 1px solid rgba(0,0,0,0.12);
+    color: var(--text-primary);
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default);
     font-family: var(--font-sans);
   }
-  .input-base::placeholder { color: #a1a1aa; }
+  .input-base::placeholder { color: var(--text-muted); }
   .input-base:focus {
-    border-color: #18181b;
-    box-shadow: 0 0 0 3px rgba(0,0,0,0.06);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-dim);
   }
 
   .nav-link {
     @apply text-sm font-medium transition-colors duration-150;
-    color: #52525b;
-  }
-  .nav-link:hover { color: #09090b; }
-
-  .divider-text {
-    @apply flex items-center gap-3 text-xs;
-    color: #a1a1aa;
-  }
-  .divider-text::before, .divider-text::after {
-    content: '';
-    @apply flex-1 h-px;
-    background: rgba(0,0,0,0.08);
-  }
-
-  .badge {
-    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium;
-  }
-
-  .shimmer {
-    background: linear-gradient(90deg, #f4f4f5 25%, #e4e4e7 50%, #f4f4f5 75%);
-    background-size: 200% 100%;
-    animation: shimmer 1.5s infinite;
-  }
-  @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-
-  .btn-ghost {
-    @apply inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-all duration-150 select-none;
-    border: 1px solid rgba(0,0,0,0.1);
     color: var(--text-secondary);
-    background: transparent;
   }
-  .btn-ghost:hover { background: var(--bg-elevated); color: var(--text-primary); }
+  .nav-link:hover { color: var(--text-primary); }
 
   .divider-text {
     @apply flex items-center gap-3 text-xs;
@@ -123,21 +119,33 @@ body {
     background: var(--border-default);
   }
 
-  .input-base {
-    @apply w-full rounded-lg px-3 py-2.5 text-sm outline-none transition-all duration-150;
-    background: var(--bg-surface);
-    border: 1px solid var(--border-default);
-    color: var(--text-primary);
+  .badge {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium;
   }
-  .input-base:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(0,0,0,0.06);
-  }
-  .input-base::placeholder { color: var(--text-muted); }
 
-  .nav-link {
-    @apply text-sm font-medium transition-colors duration-150;
-    color: var(--text-secondary);
+  .shimmer {
+    background: linear-gradient(90deg, var(--bg-elevated) 25%, var(--bg-overlay) 50%, var(--bg-elevated) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
   }
-  .nav-link:hover { color: var(--text-primary); }
+  @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+
+  /* ── Ripple Button ── */
+  .rf-ripple-btn {
+    @apply relative overflow-hidden;
+  }
+  .rf-ripple {
+    position: absolute;
+    border-radius: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    animation: rf-ripple-anim 0.6s linear;
+    background: rgba(255,255,255,0.3);
+    width: 120px;
+    height: 120px;
+    pointer-events: none;
+  }
+  .dark .rf-ripple { background: rgba(0,0,0,0.2); }
+  @keyframes rf-ripple-anim {
+    to { transform: translate(-50%, -50%) scale(4); opacity: 0; }
+  }
 }

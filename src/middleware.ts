@@ -4,13 +4,18 @@ const PUBLIC_ROUTES = ['/', '/auth/login', '/auth/signup', '/auth/role-select', 
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
+
+  // Block /admin entirely at the edge — return 404, don't even hint it exists
+  if (pathname === '/admin' || pathname.startsWith('/admin/')) {
+    return NextResponse.rewrite(new URL('/not-found', req.url))
+  }
+
   const isPublic = PUBLIC_ROUTES.some((r) => pathname === r || pathname.startsWith(r + '/'))
     || pathname.startsWith('/api/')
     || pathname.startsWith('/_next/')
 
   if (isPublic) return NextResponse.next()
 
-  // Better Auth sets a session cookie — check for it
   const session = req.cookies.get('better-auth.session_token')
     || req.cookies.get('__Secure-better-auth.session_token')
 
