@@ -32,17 +32,15 @@ function OrbBackground() {
       <div className="absolute inset-0 opacity-[0.025]"
         style={{ backgroundImage: 'linear-gradient(var(--text-primary) 1px, transparent 1px), linear-gradient(90deg, var(--text-primary) 1px, transparent 1px)', backgroundSize: '48px 48px' }} />
       {/* Orbs */}
-      <motion.div style={{ x: orb1X, y: orb1Y }}
+      <motion.div style={{ x: orb1X, y: orb1Y, background: 'radial-gradient(circle, rgba(24,24,27,0.4) 0%, transparent 70%)' } as any}
         className="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full"
         animate={{ scale: [1, 1.1, 1], opacity: [0.06, 0.1, 0.06] }}
         transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
-        style={{ background: 'radial-gradient(circle, rgba(24,24,27,0.4) 0%, transparent 70%)' } as any}
       />
-      <motion.div style={{ x: orb2X, y: orb2Y }}
+      <motion.div style={{ x: orb2X, y: orb2Y, background: 'radial-gradient(circle, rgba(24,24,27,0.35) 0%, transparent 70%)' } as any}
         className="absolute -bottom-32 -right-32 w-[600px] h-[600px] rounded-full"
         animate={{ scale: [1, 1.15, 1], opacity: [0.05, 0.09, 0.05] }}
         transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
-        style={{ background: 'radial-gradient(circle, rgba(24,24,27,0.35) 0%, transparent 70%)' } as any}
       />
       {/* Floating particles */}
       {[...Array(6)].map((_, i) => (
