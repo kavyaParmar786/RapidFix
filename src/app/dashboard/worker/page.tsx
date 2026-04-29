@@ -56,7 +56,7 @@ export default function WorkerDashboard() {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen pt-14" className='bg-white'>
+      <div className="min-h-screen pt-14, bg-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
 
           {/* Header */}
