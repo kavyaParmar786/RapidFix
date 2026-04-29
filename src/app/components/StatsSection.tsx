@@ -19,7 +19,7 @@ export default function StatsSection() {
           {stats.map((s, i) => (
             <div key={i} className="text-center">
               <p
-                className="text-4xl font-bold mb-1 text-zinc-900"
+                className="text-4xl font-bold mb-1" style={{ color: "var(--text-primary)" }}
                 style={{ fontFamily: 'var(--font-sans)' }}
               >
                 {s.value}

@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { motion, useInView, useMotionValue, useSpring, AnimatePresence } from 'framer-motion'
-import { Search, ArrowRight, Zap, Shield, Clock, Star, Sparkles } from 'lucide-react'
+import { Search, ArrowRight, Zap, Shield, Clock, Star } from 'lucide-react'
 import { fadeUp, fadeIn, staggerContainer } from '@/lib/animations'
 
 const PILLS = ['Electrician', 'Plumber', 'Carpenter', 'Painter', 'AC Repair', 'Cleaning']
@@ -42,27 +42,28 @@ export default function HeroSection() {
   }
 
   return (
-    <section className="relative pt-[52px] overflow-hidden bg-white">
+    <section className="relative pt-[52px] overflow-hidden" style={{ background: 'var(--bg-base)' }}>
       {/* Animated dot grid */}
       <motion.div
         className="absolute inset-0 -z-10"
         initial={{ opacity: 0 }}
-        animate={{ opacity: 0.5 }}
+        animate={{ opacity: 0.4 }}
         transition={{ duration: 1.5 }}
         style={{
-          backgroundImage: 'radial-gradient(circle, #d4d4d8 1px, transparent 1px)',
+          backgroundImage: 'radial-gradient(circle, var(--border-strong) 1px, transparent 1px)',
           backgroundSize: '24px 24px',
         }}
       />
-      <div className="absolute inset-0 -z-10" style={{ background: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,255,255,0) 0%, white 70%)' }} />
+      <div className="absolute inset-0 -z-10" style={{ background: 'radial-gradient(ellipse 80% 60% at 50% 0%, transparent 0%, var(--bg-base) 70%)' }} />
 
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 pt-20 pb-16 text-center">
-        {/* Animated badge */}
+        {/* Badge */}
         <motion.div
           initial={{ opacity: 0, y: -12, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs font-medium text-zinc-500 mb-8 shadow-sm"
+          className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium mb-8 shadow-sm"
+          style={{ border: '1px solid var(--border-default)', background: 'var(--bg-surface)', color: 'var(--text-secondary)' }}
         >
           <motion.span
             className="h-1.5 w-1.5 rounded-full bg-green-500"
@@ -73,14 +74,11 @@ export default function HeroSection() {
         </motion.div>
 
         {/* Headline */}
-        <motion.div
-          variants={staggerContainer(0.1, 0.1)}
-          initial="hidden"
-          animate="show"
-        >
+        <motion.div variants={staggerContainer(0.1, 0.1)} initial="hidden" animate="show">
           <motion.h1
             variants={fadeUp}
-            className="text-5xl sm:text-6xl lg:text-7xl font-bold text-zinc-900 tracking-tight leading-[1.05] mb-3"
+            className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05] mb-3"
+            style={{ color: 'var(--text-primary)' }}
           >
             Book a
           </motion.h1>
@@ -93,7 +91,8 @@ export default function HeroSection() {
                   animate={{ y: 0, opacity: 1 }}
                   exit={{ y: '-100%', opacity: 0 }}
                   transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-                  className="block text-zinc-400"
+                  className="block"
+                  style={{ color: 'var(--text-muted)' }}
                 >
                   {ROTATING_WORDS[wordIdx]}
                 </motion.span>
@@ -102,7 +101,8 @@ export default function HeroSection() {
           </motion.div>
           <motion.h1
             variants={fadeUp}
-            className="text-5xl sm:text-6xl lg:text-7xl font-bold text-zinc-900 tracking-tight leading-[1.05] mb-6"
+            className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.05] mb-6"
+            style={{ color: 'var(--text-primary)' }}
           >
             in minutes.
           </motion.h1>
@@ -112,7 +112,8 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-          className="text-lg text-zinc-500 max-w-xl mx-auto mb-10 leading-relaxed"
+          className="text-lg max-w-xl mx-auto mb-10 leading-relaxed"
+          style={{ color: 'var(--text-secondary)' }}
         >
           Book a verified professional for any home repair in minutes.
           Fast, reliable, and affordable — right here in Rajkot.
@@ -127,13 +128,13 @@ export default function HeroSection() {
           className="flex gap-2 max-w-lg mx-auto mb-8"
         >
           <div className="relative flex-1">
-            <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400" />
+            <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-muted)' }} />
             <input
               type="text"
               value={query}
               onChange={e => setQuery(e.target.value)}
               placeholder="What do you need fixed?"
-              className="w-full rounded-xl border border-zinc-200 bg-white px-4 pl-10 py-3 text-sm text-zinc-900 placeholder-zinc-400 outline-none focus:border-zinc-400 focus:ring-4 focus:ring-zinc-100 shadow-sm transition-all"
+              className="input-base pl-10 rounded-xl shadow-sm"
             />
           </div>
           <motion.button
@@ -157,7 +158,12 @@ export default function HeroSection() {
             <motion.div key={p} variants={fadeUp}>
               <Link
                 href={`/services/${p.toLowerCase().replace(' ', '-')}`}
-                className="rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-600 hover:border-zinc-400 hover:text-zinc-900 transition-all shadow-sm inline-block"
+                className="rounded-full px-3 py-1.5 text-xs font-medium transition-all shadow-sm inline-block"
+                style={{
+                  border: '1px solid var(--border-default)',
+                  background: 'var(--bg-surface)',
+                  color: 'var(--text-secondary)',
+                }}
               >
                 {p}
               </Link>
@@ -178,19 +184,19 @@ export default function HeroSection() {
             { icon: Clock, text: '24/7 available' },
             { icon: Star, text: '4.8 avg rating' },
           ].map(({ icon: Icon, text }) => (
-            <motion.div key={text} variants={fadeIn} className="flex items-center gap-1.5 text-xs text-zinc-400">
-              <Icon size={12} className="text-zinc-400" /> {text}
+            <motion.div key={text} variants={fadeIn} className="flex items-center gap-1.5 text-xs" style={{ color: 'var(--text-muted)' }}>
+              <Icon size={12} /> {text}
             </motion.div>
           ))}
         </motion.div>
       </div>
 
-      {/* Animated stats bar */}
+      {/* Stats bar */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.9, duration: 0.6 }}
-        className="border-t border-zinc-100 bg-zinc-50"
+        style={{ borderTop: '1px solid var(--border-subtle)', background: 'var(--bg-surface)' }}
       >
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-5">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
@@ -201,11 +207,11 @@ export default function HeroSection() {
               { value: 4.8, suffix: '★', label: 'Average Rating', isFloat: true },
             ].map(({ value, suffix, label, isFloat }) => (
               <div key={label}>
-                <p className="text-xl font-bold text-zinc-900">
+                <p className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
                   {isFloat ? value : <AnimatedCounter target={value as number} suffix={suffix} />}
                   {isFloat && suffix}
                 </p>
-                <p className="text-xs text-zinc-400 mt-0.5">{label}</p>
+                <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>{label}</p>
               </div>
             ))}
           </div>

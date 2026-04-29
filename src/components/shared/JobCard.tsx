@@ -16,7 +16,6 @@ interface JobCardProps {
 }
 
 export default function JobCard({ job, showAccept, viewAs, onAccept, accepting }: JobCardProps) {
-  // viewAs='worker' with onAccept behaves like showAccept=true
   const canAccept = showAccept || (viewAs === 'worker' && !!onAccept)
   const cat = getCategoryConfig(job.category)
   const status = STATUS_CONFIG[job.status]
@@ -24,9 +23,10 @@ export default function JobCard({ job, showAccept, viewAs, onAccept, accepting }
 
   return (
     <motion.div
-      whileHover={{ y: -3, boxShadow: '0 12px 32px rgba(0,0,0,0.1)' }}
+      whileHover={{ y: -3, boxShadow: '0 12px 32px rgba(0,0,0,0.12)' }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
-      className="glass-card group relative overflow-hidden p-5 transition-all duration-300 hover:border-black/20">
+      className="glass-card group relative overflow-hidden p-5 transition-all duration-300"
+    >
       {/* Top row */}
       <div className="flex items-start justify-between gap-3 mb-4">
         <div className="flex items-center gap-3">
@@ -34,7 +34,7 @@ export default function JobCard({ job, showAccept, viewAs, onAccept, accepting }
             {cat.icon}
           </div>
           <div>
-            <h3 className="font-semibold text-zinc-900 leading-tight line-clamp-1">{job.title}</h3>
+            <h3 className="font-semibold leading-tight line-clamp-1" style={{ color: 'var(--text-primary)' }}>{job.title}</h3>
             <p className="text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>{cat.label}</p>
           </div>
         </div>
@@ -60,10 +60,10 @@ export default function JobCard({ job, showAccept, viewAs, onAccept, accepting }
       {job.images && job.images.length > 0 && (
         <div className="flex gap-2 mb-4">
           {job.images.slice(0, 3).map((img, i) => (
-            <div key={i} className="relative h-16 w-16 overflow-hidden rounded-lg border border-black/10">
+            <div key={i} className="relative h-16 w-16 overflow-hidden rounded-lg" style={{ border: '1px solid var(--border-default)' }}>
               <Image src={img} alt="" fill className="object-cover" />
               {i === 2 && job.images!.length > 3 && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/60 text-xs font-bold text-zinc-900">
+                <div className="absolute inset-0 flex items-center justify-center bg-black/60 text-xs font-bold text-white">
                   +{job.images!.length - 3}
                 </div>
               )}
@@ -75,11 +75,11 @@ export default function JobCard({ job, showAccept, viewAs, onAccept, accepting }
       {/* Meta */}
       <div className="flex flex-wrap items-center gap-3 text-xs mb-4" style={{ color: 'var(--text-secondary)' }}>
         <span className="flex items-center gap-1">
-          <MapPin size={11} className="text-zinc-500" />
+          <MapPin size={11} style={{ color: 'var(--text-muted)' }} />
           {job.location}
         </span>
         <span className="flex items-center gap-1">
-          <Clock size={11} className="text-zinc-500" />
+          <Clock size={11} style={{ color: 'var(--text-muted)' }} />
           {formatRelativeTime(job.createdAt)}
         </span>
         {job.budget && (
@@ -96,16 +96,19 @@ export default function JobCard({ job, showAccept, viewAs, onAccept, accepting }
       {/* Customer info */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="h-6 w-6 overflow-hidden rounded-full bg-zinc-900 flex-shrink-0">
+          <div
+            className="h-6 w-6 overflow-hidden rounded-full flex-shrink-0 flex items-center justify-center"
+            style={{ background: 'var(--bg-elevated)' }}
+          >
             {job.customerPhoto ? (
               <Image src={job.customerPhoto} alt="" width={24} height={24} className="object-cover" />
             ) : (
-              <span className="flex h-full w-full items-center justify-center text-[10px] font-bold text-zinc-900">
+              <span className="text-[10px] font-bold" style={{ color: 'var(--text-primary)' }}>
                 {job.customerName?.[0]?.toUpperCase()}
               </span>
             )}
           </div>
-          <span className="text-xs text-zinc-500">{job.customerName}</span>
+          <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>{job.customerName}</span>
         </div>
 
         {canAccept && job.status === 'posted' && (
@@ -114,10 +117,13 @@ export default function JobCard({ job, showAccept, viewAs, onAccept, accepting }
             disabled={accepting}
             className={cn(
               'flex items-center gap-1.5 rounded-lg px-4 py-1.5 text-sm font-semibold transition-all',
-              accepting
-                ? 'bg-zinc-100 text-zinc-400 cursor-not-allowed'
-                : 'bg-gradient-to-r from-zinc-700 to-violet-600 text-zinc-900 hover:shadow-lg hover:shadow-indigo-500/30 hover:scale-105'
+              accepting ? 'cursor-not-allowed' : 'hover:shadow-lg hover:shadow-indigo-500/30 hover:scale-105'
             )}
+            style={
+              accepting
+                ? { background: 'var(--bg-elevated)', color: 'var(--text-muted)' }
+                : { background: 'linear-gradient(to right, #3f3f46, #7c3aed)', color: 'white' }
+            }
           >
             <CheckCircle size={13} />
             {accepting ? 'Accepting…' : 'Accept Job'}
@@ -127,7 +133,8 @@ export default function JobCard({ job, showAccept, viewAs, onAccept, accepting }
         {job.chatId && (
           <Link
             href={`/chat/${job.chatId}`}
-            className="flex items-center gap-1.5 rounded-lg px-4 py-1.5 text-sm font-semibold bg-zinc-100 text-zinc-900 transition-all hover:bg-white/15"
+            className="flex items-center gap-1.5 rounded-lg px-4 py-1.5 text-sm font-semibold transition-all"
+            style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)' }}
           >
             Open Chat
           </Link>
