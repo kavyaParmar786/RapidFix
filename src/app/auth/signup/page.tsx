@@ -27,10 +27,9 @@ function OrbBackground() {
     <div className="fixed inset-0 overflow-hidden pointer-events-none">
       <div className="absolute inset-0 opacity-[0.025]"
         style={{ backgroundImage: 'linear-gradient(var(--text-primary) 1px, transparent 1px), linear-gradient(90deg, var(--text-primary) 1px, transparent 1px)', backgroundSize: '48px 48px' }} />
-      <motion.div style={{ x: orb1X, y: orb1Y }}
+      <motion.div style={{ x: orb1X, y: orb1Y, background: 'radial-gradient(circle, var(--text-primary) 0%, transparent 70%)' } as any}
         className="absolute top-0 right-0 w-[480px] h-[480px] rounded-full opacity-[0.07]"
-        animate={{ scale: [1, 1.08, 1] }} transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }}
-        style={{ background: 'radial-gradient(circle, var(--text-primary) 0%, transparent 70%)' } as any} />
+        animate={{ scale: [1, 1.08, 1] }} transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }} />
       {[...Array(5)].map((_, i) => (
         <motion.div key={i} className="absolute w-1 h-1 rounded-full"
           style={{ background: 'var(--text-muted)', left: `${10 + i * 18}%`, top: `${15 + (i % 3) * 28}%` }}
