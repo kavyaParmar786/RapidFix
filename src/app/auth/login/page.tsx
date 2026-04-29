@@ -1,14 +1,13 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Eye, EyeOff, Mail, Lock, ArrowRight, Zap } from 'lucide-react'
+import { Eye, EyeOff, Mail, Lock, ArrowRight } from 'lucide-react'
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion'
 import { useAuth } from '@/lib/auth-context'
 import toast from 'react-hot-toast'
 
-/* ── Animated orb background ── */
 function OrbBackground() {
   const mouseX = useMotionValue(0)
   const mouseY = useMotionValue(0)
@@ -28,21 +27,18 @@ function OrbBackground() {
 
   return (
     <div className="fixed inset-0 overflow-hidden pointer-events-none">
-      {/* Grid */}
       <div className="absolute inset-0 opacity-[0.025]"
         style={{ backgroundImage: 'linear-gradient(var(--text-primary) 1px, transparent 1px), linear-gradient(90deg, var(--text-primary) 1px, transparent 1px)', backgroundSize: '48px 48px' }} />
-      {/* Orbs */}
-      <motion.div style={{ x: orb1X, y: orb1Y, background: 'radial-gradient(circle, rgba(24,24,27,0.4) 0%, transparent 70%)' } as any}
-        className="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full"
-        animate={{ scale: [1, 1.1, 1], opacity: [0.06, 0.1, 0.06] }}
+      <motion.div style={{ x: orb1X, y: orb1Y, background: 'radial-gradient(circle, var(--text-primary) 0%, transparent 70%)' } as any}
+        className="absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full opacity-[0.07]"
+        animate={{ scale: [1, 1.1, 1] }}
         transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
       />
-      <motion.div style={{ x: orb2X, y: orb2Y, background: 'radial-gradient(circle, rgba(24,24,27,0.35) 0%, transparent 70%)' } as any}
-        className="absolute -bottom-32 -right-32 w-[600px] h-[600px] rounded-full"
-        animate={{ scale: [1, 1.15, 1], opacity: [0.05, 0.09, 0.05] }}
+      <motion.div style={{ x: orb2X, y: orb2Y, background: 'radial-gradient(circle, var(--text-primary) 0%, transparent 70%)' } as any}
+        className="absolute -bottom-32 -right-32 w-[600px] h-[600px] rounded-full opacity-[0.06]"
+        animate={{ scale: [1, 1.15, 1] }}
         transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
       />
-      {/* Floating particles */}
       {[...Array(6)].map((_, i) => (
         <motion.div key={i}
           className="absolute w-1 h-1 rounded-full"
@@ -88,10 +84,7 @@ export default function LoginPage() {
     } finally { setSubmitting(false) }
   }
 
-  const stagger = {
-    hidden: {},
-    show: { transition: { staggerChildren: 0.08, delayChildren: 0.1 } }
-  }
+  const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.08, delayChildren: 0.1 } } }
   const fadeUp = {
     hidden: { opacity: 0, y: 20, filter: 'blur(4px)' },
     show: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } }
@@ -100,11 +93,8 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center relative px-4 py-16" style={{ background: 'var(--bg-base)' }}>
       <OrbBackground />
+      <motion.div variants={stagger} initial="hidden" animate="show" className="relative z-10 w-full max-w-[400px]">
 
-      <motion.div
-        variants={stagger} initial="hidden" animate="show"
-        className="relative z-10 w-full max-w-[400px]"
-      >
         {/* Logo */}
         <motion.div variants={fadeUp} className="flex justify-center mb-8">
           <Link href="/" className="flex items-center gap-2.5 group">
@@ -125,11 +115,9 @@ export default function LoginPage() {
             boxShadow: '0 24px 64px rgba(0,0,0,0.08), 0 0 0 1px var(--border-subtle)',
           }}>
 
-          {/* Corner glow */}
           <div className="absolute -top-px -right-px w-32 h-32 rounded-bl-full opacity-40"
             style={{ background: 'radial-gradient(circle at top right, var(--bg-overlay), transparent)' }} />
 
-          {/* Header */}
           <div className="mb-7">
             <h1 className="text-2xl font-bold mb-1.5" style={{ color: 'var(--text-primary)' }}>Welcome back</h1>
             <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Sign in to your RapidFix account</p>
@@ -152,10 +140,8 @@ export default function LoginPage() {
             <span>{googleLoading ? 'Signing in…' : 'Continue with Google'}</span>
           </motion.button>
 
-          {/* Divider */}
           <div className="divider-text mb-5 text-xs" style={{ color: 'var(--text-muted)' }}>or continue with email</div>
 
-          {/* Unverified banner */}
           <AnimatePresence>
             {unverified && (
               <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
@@ -167,7 +153,6 @@ export default function LoginPage() {
           </AnimatePresence>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Email */}
             <div>
               <label className="block text-xs font-semibold mb-2" style={{ color: 'var(--text-secondary)' }}>Email address</label>
               <div className="relative">
@@ -179,7 +164,6 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Password */}
             <div>
               <label className="block text-xs font-semibold mb-2" style={{ color: 'var(--text-secondary)' }}>Password</label>
               <div className="relative">
@@ -195,28 +179,21 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Submit */}
             <motion.button type="submit" disabled={submitting || googleLoading}
               whileHover={{ scale: 1.015 }} whileTap={{ scale: 0.98 }}
-              className="btn-primary w-full py-3 rounded-xl mt-2 relative overflow-hidden text-sm font-semibold">
+              className="btn-primary w-full py-3 rounded-xl mt-2 text-sm font-semibold">
               {submitting
                 ? <><div className="h-4 w-4 rounded-full border-2 border-current/40 border-t-current animate-spin mr-2 inline-block" />Signing in…</>
                 : <>Sign in <ArrowRight size={14} className="ml-1.5 inline" /></>}
-              {/* Shimmer overlay on hover */}
-              <motion.div className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity"
-                style={{ background: 'linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.1) 50%, transparent 60%)' }} />
             </motion.button>
           </form>
 
           <p className="mt-6 text-center text-sm" style={{ color: 'var(--text-muted)' }}>
             Don&apos;t have an account?{' '}
-            <Link href="/auth/signup" className="font-semibold transition-colors" style={{ color: 'var(--text-primary)' }}>
-              Sign up free
-            </Link>
+            <Link href="/auth/signup" className="font-semibold transition-colors" style={{ color: 'var(--text-primary)' }}>Sign up free</Link>
           </p>
         </motion.div>
 
-        {/* Bottom links */}
         <motion.p variants={fadeUp} className="mt-6 text-center text-xs" style={{ color: 'var(--text-muted)' }}>
           <Link href="/terms" className="hover:underline">Terms</Link>
           {' · '}

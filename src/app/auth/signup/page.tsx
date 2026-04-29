@@ -4,11 +4,10 @@ import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Eye, EyeOff, Mail, Lock, User, ArrowRight, CheckCircle, Sparkles, Wrench } from 'lucide-react'
-import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion'
+import { Eye, EyeOff, Mail, Lock, User, ArrowRight, CheckCircle } from 'lucide-react'
+import { motion, useMotionValue, useTransform } from 'framer-motion'
 import { useAuth } from '@/lib/auth-context'
 import { UserRole } from '@/types'
-import { cn } from '@/lib/utils'
 import toast from 'react-hot-toast'
 
 function OrbBackground() {
@@ -48,11 +47,13 @@ function SignupForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPw, setShowPw] = useState(false)
-  const [role, setRole] = useState<UserRole>(defaultRole)
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
   const [done, setDone] = useState(false)
   const [focusedField, setFocusedField] = useState<string | null>(null)
+
+  // role is inferred from the URL param — no need to show a selector
+  const role: UserRole = defaultRole
 
   const handleGoogle = async () => {
     setGoogleLoading(true)
@@ -132,32 +133,6 @@ function SignupForm() {
           <div className="mb-6 relative">
             <h1 className="text-2xl font-bold mb-1.5" style={{ color: 'var(--text-primary)' }}>Create account</h1>
             <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Join 50,000+ users on RapidFix</p>
-          </div>
-
-          {/* Role selector */}
-          <div className="mb-5 relative">
-            <p className="text-xs font-semibold mb-2" style={{ color: 'var(--text-secondary)' }}>I want to</p>
-            <div className="grid grid-cols-2 gap-2">
-              {[
-                { key: 'customer' as UserRole, label: 'Hire a Worker', icon: Sparkles, desc: 'Get jobs done fast' },
-                { key: 'worker' as UserRole, label: 'Find Work', icon: Wrench, desc: 'Earn on your schedule' },
-              ].map(({ key, label, icon: Icon, desc }) => (
-                <motion.button key={key} type="button" onClick={() => setRole(key)} whileTap={{ scale: 0.97 }}
-                  className={cn(
-                    'flex flex-col items-start gap-1 rounded-xl p-3.5 border transition-all duration-200 text-left',
-                    role === key
-                      ? 'border-[var(--border-strong)] bg-[var(--bg-elevated)]'
-                      : 'border-[var(--border-subtle)] hover:border-[var(--border-default)] hover:bg-[var(--bg-elevated)]'
-                  )}>
-                  <span className={cn('h-7 w-7 rounded-lg flex items-center justify-center mb-0.5',
-                    role === key ? 'bg-[var(--accent)] text-[var(--bg-base)]' : 'bg-[var(--bg-overlay)]')}>
-                    <Icon size={13} style={{ color: role === key ? 'var(--bg-base)' : 'var(--text-secondary)' }} />
-                  </span>
-                  <span className="text-xs font-semibold" style={{ color: 'var(--text-primary)' }}>{label}</span>
-                  <span className="text-[11px]" style={{ color: 'var(--text-muted)' }}>{desc}</span>
-                </motion.button>
-              ))}
-            </div>
           </div>
 
           {/* Google */}
