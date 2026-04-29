@@ -20,54 +20,65 @@ const ThemeContext = createContext<ThemeContextType>({
 
 function getDynamicTheme(): 'light' | 'dark' {
   const hour = new Date().getHours()
-  // Light: 6am - 7pm, Dark: 7pm - 6am
   return hour >= 6 && hour < 19 ? 'light' : 'dark'
 }
 
+function getSystemTheme(): 'light' | 'dark' {
+  if (typeof window === 'undefined') return 'light'
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+}
+
+function applyClass(resolved: 'light' | 'dark') {
+  const root = document.documentElement
+  if (resolved === 'dark') {
+    root.classList.add('dark')
+  } else {
+    root.classList.remove('dark')
+  }
+}
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  // Read saved value during first render (client only — suppressed on server via suppressHydrationWarning)
   const [mode, setModeState] = useState<ThemeMode>('light')
   const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light')
+  const [mounted, setMounted] = useState(false)
 
-  const applyTheme = useCallback((m: ThemeMode) => {
-    let resolved: 'light' | 'dark'
-    if (m === 'dynamic') {
-      resolved = getDynamicTheme()
-    } else {
-      resolved = m
-    }
-    setResolvedTheme(resolved)
-    const root = document.documentElement
-    if (resolved === 'dark') {
-      root.classList.add('dark')
-    } else {
-      root.classList.remove('dark')
-    }
+  const resolve = useCallback((m: ThemeMode): 'light' | 'dark' => {
+    if (m === 'dynamic') return getDynamicTheme()
+    return m
   }, [])
 
+  // On mount: read localStorage, apply immediately
   useEffect(() => {
     const saved = (localStorage.getItem('rf-theme') as ThemeMode) || 'light'
+    const resolved = resolve(saved)
     setModeState(saved)
-    applyTheme(saved)
-  }, [applyTheme])
+    setResolvedTheme(resolved)
+    applyClass(resolved)
+    setMounted(true)
+  }, [resolve])
 
-  // For dynamic mode, re-check every minute
+  // Re-check dynamic every minute
   useEffect(() => {
-    if (mode !== 'dynamic') return
-    const interval = setInterval(() => {
-      applyTheme('dynamic')
-    }, 60 * 1000)
-    return () => clearInterval(interval)
-  }, [mode, applyTheme])
+    if (!mounted || mode !== 'dynamic') return
+    const id = setInterval(() => {
+      const resolved = resolve('dynamic')
+      setResolvedTheme(resolved)
+      applyClass(resolved)
+    }, 60_000)
+    return () => clearInterval(id)
+  }, [mounted, mode, resolve])
 
   const setMode = useCallback((m: ThemeMode) => {
+    const resolved = resolve(m)
     setModeState(m)
+    setResolvedTheme(resolved)
     localStorage.setItem('rf-theme', m)
-    applyTheme(m)
-  }, [applyTheme])
+    applyClass(resolved)
+  }, [resolve])
 
   const toggle = useCallback(() => {
-    const next = resolvedTheme === 'light' ? 'dark' : 'light'
-    setMode(next)
+    setMode(resolvedTheme === 'light' ? 'dark' : 'light')
   }, [resolvedTheme, setMode])
 
   return (

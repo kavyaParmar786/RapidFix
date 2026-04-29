@@ -23,9 +23,32 @@ export const metadata: Metadata = {
   },
 }
 
+// Injected before React hydrates — reads localStorage and applies
+// the correct theme class synchronously to <html> to prevent flash.
+const themeScript = `
+(function () {
+  try {
+    var t = localStorage.getItem('rf-theme');
+    var isDark =
+      t === 'dark' ||
+      (t === 'dynamic' && (new Date().getHours() < 6 || new Date().getHours() >= 19)) ||
+      (!t && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  } catch (e) {}
+})();
+`
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning>
+      <head>
+        {/* Blocking script — must run before first paint to avoid theme flash */}
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body>
         <ThemeProvider>
           <AuthProvider>
