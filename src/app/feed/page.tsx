@@ -10,6 +10,7 @@ import { CATEGORIES, cn } from '@/lib/utils'
 import { PageLoader } from '@/components/ui/Spinner'
 import JobCard from '@/components/shared/JobCard'
 import Navbar from '@/components/layout/Navbar'
+import PageTransition from '@/components/shared/PageTransition'
 import toast from 'react-hot-toast'
 
 export default function FeedPage() {

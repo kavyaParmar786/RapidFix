@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { MapPin, Clock, DollarSign, Zap, CheckCircle } from 'lucide-react'
+import { motion } from 'framer-motion'
 import { Job } from '@/types'
 import { cn, getCategoryConfig, STATUS_CONFIG, URGENCY_CONFIG, formatRelativeTime } from '@/lib/utils'
 
@@ -22,7 +23,10 @@ export default function JobCard({ job, showAccept, viewAs, onAccept, accepting }
   const urgency = URGENCY_CONFIG[job.urgency]
 
   return (
-    <div className="glass-card group relative overflow-hidden p-5 transition-all duration-300 hover:border-black/20 hover:shadow-lg hover:shadow-indigo-500/10">
+    <motion.div
+      whileHover={{ y: -3, boxShadow: '0 12px 32px rgba(0,0,0,0.1)' }}
+      transition={{ duration: 0.2, ease: 'easeOut' }}
+      className="glass-card group relative overflow-hidden p-5 transition-all duration-300 hover:border-black/20">
       {/* Top row */}
       <div className="flex items-start justify-between gap-3 mb-4">
         <div className="flex items-center gap-3">
@@ -129,6 +133,6 @@ export default function JobCard({ job, showAccept, viewAs, onAccept, accepting }
           </Link>
         )}
       </div>
-    </div>
+    </motion.div>
   )
 }

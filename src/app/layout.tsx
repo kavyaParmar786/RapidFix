@@ -1,32 +1,16 @@
 import type { Metadata } from 'next'
-import { Syne, DM_Sans, JetBrains_Mono } from 'next/font/google'
+import { Inter } from 'next/font/google'
 import '@/styles/globals.css'
 import { AuthProvider } from '@/lib/auth-context'
 import { Toaster } from 'react-hot-toast'
 
-const syne = Syne({
+const inter = Inter({
   subsets: ['latin'],
   variable: '--font-sans',
   display: 'swap',
-  weight: ['400', '500', '600', '700', '800'],
-})
-
-const dmSans = DM_Sans({
-  subsets: ['latin'],
-  variable: '--font-dm-sans',
-  display: 'swap',
-  weight: ['300', '400', '500', '600'],
-})
-
-const jetbrains = JetBrains_Mono({
-  subsets: ['latin'],
-  variable: '--font-jetbrains',
-  display: 'swap',
-  weight: ['400', '500'],
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://rapid-fix-henna.vercel.app'),
   title: 'RapidFix — Home Services On Demand',
   description: 'Connect with skilled local professionals for all your home service needs.',
   keywords: ['home services', 'repair', 'electrician', 'plumber', 'handyman', 'on-demand'],
@@ -40,7 +24,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${syne.variable} ${dmSans.variable} ${jetbrains.variable}`}>
+    <html lang="en" className={inter.variable}>
       <body>
         <AuthProvider>
           {children}
@@ -48,13 +32,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             position="top-right"
             toastOptions={{
               style: {
-                background: '#0f1420',
-                color: '#f0f4ff',
-                border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: '12px',
-                fontSize: '14px',
+                background: '#18181b',
+                color: '#fafafa',
+                border: '1px solid rgba(0,0,0,0.15)',
+                borderRadius: '10px',
+                fontSize: '13px',
+                fontWeight: '500',
+                boxShadow: '0 4px 24px rgba(0,0,0,0.15)',
               },
-              success: { iconTheme: { primary: '#6366f1', secondary: '#fff' } },
+              success: { iconTheme: { primary: '#22c55e', secondary: '#fff' } },
               error: { iconTheme: { primary: '#ef4444', secondary: '#fff' } },
             }}
           />

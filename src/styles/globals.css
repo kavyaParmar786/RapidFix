@@ -104,4 +104,40 @@ body {
     animation: shimmer 1.5s infinite;
   }
   @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-all duration-150 select-none;
+    border: 1px solid rgba(0,0,0,0.1);
+    color: var(--text-secondary);
+    background: transparent;
+  }
+  .btn-ghost:hover { background: var(--bg-elevated); color: var(--text-primary); }
+
+  .divider-text {
+    @apply flex items-center gap-3 text-xs;
+    color: var(--text-muted);
+  }
+  .divider-text::before, .divider-text::after {
+    content: '';
+    @apply flex-1 h-px;
+    background: var(--border-default);
+  }
+
+  .input-base {
+    @apply w-full rounded-lg px-3 py-2.5 text-sm outline-none transition-all duration-150;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-default);
+    color: var(--text-primary);
+  }
+  .input-base:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.06);
+  }
+  .input-base::placeholder { color: var(--text-muted); }
+
+  .nav-link {
+    @apply text-sm font-medium transition-colors duration-150;
+    color: var(--text-secondary);
+  }
+  .nav-link:hover { color: var(--text-primary); }
 }

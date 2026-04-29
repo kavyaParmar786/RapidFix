@@ -1,5 +1,7 @@
 'use client'
+// animated
 
+import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
