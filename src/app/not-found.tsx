@@ -11,8 +11,8 @@ export default function NotFound() {
         <Image src="/logo.png" alt="RapidFix" fill className="object-contain opacity-60" />
       </div>
       <h1
-        className="text-7xl font-bold mb-4 gradient-text"
-        style={{ fontFamily: 'var(--font-syne)' }}
+        className="text-7xl font-bold mb-4 text-zinc-900"
+        style={{ fontFamily: 'var(--font-sans)' }}
       >
         404
       </h1>

@@ -97,7 +97,7 @@ export default function ProfilePage() {
       <Navbar />
       <div className="min-h-screen pt-16" style={{ background: 'var(--bg-base)' }}>
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-10">
-          <h1 className="text-2xl font-bold text-zinc-900 mb-8" style={{ fontFamily: 'var(--font-syne)' }}>
+          <h1 className="text-2xl font-bold text-zinc-900 mb-8" style={{ fontFamily: 'var(--font-sans)' }}>
             My Profile
           </h1>
 
@@ -106,14 +106,14 @@ export default function ProfilePage() {
             <div className="flex items-start gap-5 flex-wrap">
               {/* Avatar */}
               <div className="relative flex-shrink-0">
-                <div className="h-20 w-20 overflow-hidden rounded-2xl bg-indigo-500/30 flex items-center justify-center text-3xl font-bold text-indigo-300">
+                <div className="h-20 w-20 overflow-hidden rounded-2xl bg-zinc-900/30 flex items-center justify-center text-3xl font-bold text-zinc-600">
                   {profile.photoURL ? (
                     <Image src={profile.photoURL} alt="" width={80} height={80} className="object-cover" />
                   ) : (
                     profile.displayName?.[0]?.toUpperCase()
                   )}
                 </div>
-                <label className="absolute -bottom-1.5 -right-1.5 flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-indigo-500 border-2 border-[var(--bg-base)] text-zinc-900 hover:bg-indigo-400 transition-colors">
+                <label className="absolute -bottom-1.5 -right-1.5 flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-zinc-900 border-2 border-[var(--bg-base)] text-zinc-900 hover:bg-zinc-700 transition-colors">
                   {uploading ? (
                     <div className="h-3 w-3 rounded-full border-2 border-white/30 border-t-white animate-spin" />
                   ) : (
@@ -132,11 +132,11 @@ export default function ProfilePage() {
                     className="input-base text-lg font-bold mb-2"
                   />
                 ) : (
-                  <h2 className="text-xl font-bold text-zinc-900 mb-1" style={{ fontFamily: 'var(--font-syne)' }}>
+                  <h2 className="text-xl font-bold text-zinc-900 mb-1" style={{ fontFamily: 'var(--font-sans)' }}>
                     {profile.displayName}
                   </h2>
                 )}
-                <p className="text-sm text-indigo-400 capitalize mb-2">{profile.role}</p>
+                <p className="text-sm text-zinc-500 capitalize mb-2">{profile.role}</p>
 
                 {profile.role === 'worker' && (
                   <div className="flex items-center gap-2">
@@ -159,7 +159,7 @@ export default function ProfilePage() {
 
           {/* Details form */}
           <div className="glass-card p-6 mb-6 space-y-5">
-            <h3 className="font-semibold text-zinc-900" style={{ fontFamily: 'var(--font-syne)' }}>
+            <h3 className="font-semibold text-zinc-900" style={{ fontFamily: 'var(--font-sans)' }}>
               Personal Info
             </h3>
 
@@ -242,7 +242,7 @@ export default function ProfilePage() {
                           className={cn(
                             'flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs transition-all',
                             form.skills.includes(cat.value)
-                              ? 'border-indigo-500/60 bg-indigo-500/20 text-indigo-300'
+                              ? 'border-zinc-300/60 bg-zinc-900/20 text-zinc-600'
                               : 'border-black/10 bg-zinc-50 text-zinc-500 hover:border-black/20'
                           )}
                         >
@@ -258,7 +258,7 @@ export default function ProfilePage() {
                         profile.skills!.map((s) => {
                           const cat = CATEGORIES.find((c) => c.value === s)
                           return cat ? (
-                            <span key={s} className="flex items-center gap-1.5 rounded-full border border-indigo-500/30 bg-indigo-500/10 px-3 py-1 text-xs text-indigo-300">
+                            <span key={s} className="flex items-center gap-1.5 rounded-full border border-zinc-300/30 bg-zinc-900/10 px-3 py-1 text-xs text-zinc-600">
                               {cat.icon} {cat.label}
                             </span>
                           ) : null
@@ -285,7 +285,7 @@ export default function ProfilePage() {
           {/* Reviews (worker only) */}
           {profile.role === 'worker' && (
             <div className="glass-card p-6">
-              <h3 className="font-semibold text-zinc-900 mb-4" style={{ fontFamily: 'var(--font-syne)' }}>
+              <h3 className="font-semibold text-zinc-900 mb-4" style={{ fontFamily: 'var(--font-sans)' }}>
                 Reviews ({reviews.length})
               </h3>
               {reviews.length === 0 ? (

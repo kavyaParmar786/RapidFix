@@ -93,10 +93,10 @@ export default function JobDetailPage() {
                   {cat.icon}
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold text-zinc-900" style={{ fontFamily: 'var(--font-syne)' }}>
+                  <h1 className="text-xl font-bold text-zinc-900" style={{ fontFamily: 'var(--font-sans)' }}>
                     {job.title}
                   </h1>
-                  <p className="text-sm text-indigo-400">{cat.label}</p>
+                  <p className="text-sm text-zinc-500">{cat.label}</p>
                 </div>
               </div>
               <span className={cn('status-badge', status.bg, status.color)}>
@@ -107,8 +107,8 @@ export default function JobDetailPage() {
 
             {/* Meta */}
             <div className="flex flex-wrap gap-4 mt-5 text-sm" style={{ color: 'var(--text-secondary)' }}>
-              <span className="flex items-center gap-1.5"><MapPin size={13} className="text-indigo-400" />{job.location}</span>
-              <span className="flex items-center gap-1.5"><Clock size={13} className="text-indigo-400" />{formatRelativeTime(job.createdAt)}</span>
+              <span className="flex items-center gap-1.5"><MapPin size={13} className="text-zinc-500" />{job.location}</span>
+              <span className="flex items-center gap-1.5"><Clock size={13} className="text-zinc-500" />{formatRelativeTime(job.createdAt)}</span>
               {job.budget && <span className="flex items-center gap-1.5 text-green-400 font-medium"><DollarSign size={13} />₹{job.budget.toLocaleString()}</span>}
               <span className={cn('flex items-center gap-1.5 font-medium', urgency.color)}>
                 <Zap size={13} />{urgency.label} Priority
@@ -142,7 +142,7 @@ export default function JobDetailPage() {
           {job.workerId && (
             <div className="glass-card p-5 mb-5 flex items-center justify-between gap-4 flex-wrap">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 overflow-hidden rounded-full bg-indigo-500/30 flex items-center justify-center text-sm font-bold text-indigo-300">
+                <div className="h-10 w-10 overflow-hidden rounded-full bg-zinc-900/30 flex items-center justify-center text-sm font-bold text-zinc-600">
                   {job.workerPhoto ? (
                     <Image src={job.workerPhoto} alt="" width={40} height={40} className="object-cover rounded-full" />
                   ) : (
@@ -151,7 +151,7 @@ export default function JobDetailPage() {
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-zinc-900">{job.workerName}</p>
-                  <p className="text-xs text-indigo-400">Assigned Worker</p>
+                  <p className="text-xs text-zinc-500">Assigned Worker</p>
                 </div>
               </div>
               {job.chatId && (
@@ -207,7 +207,7 @@ export default function JobDetailPage() {
 
           {/* Review form */}
           {showReview && isCustomer && !reviewSent && (
-            <div className="glass-card p-6 mt-5 border-indigo-500/30">
+            <div className="glass-card p-6 mt-5 border-zinc-300/30">
               <h2 className="font-semibold text-zinc-900 mb-4">Rate {job.workerName}</h2>
               <StarRating value={rating} onChange={setRating} size={28} />
               <textarea

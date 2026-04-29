@@ -106,7 +106,7 @@ export default function PostJobPage() {
           </Link>
 
           <div className="glass-card p-8">
-            <h1 className="text-2xl font-bold text-zinc-900 mb-2" style={{ fontFamily: 'var(--font-syne)' }}>
+            <h1 className="text-2xl font-bold text-zinc-900 mb-2" style={{ fontFamily: 'var(--font-sans)' }}>
               Post a Service Request
             </h1>
             <p className="text-sm mb-8" style={{ color: 'var(--text-secondary)' }}>
@@ -143,7 +143,7 @@ export default function PostJobPage() {
                       className={cn(
                         'flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm transition-all',
                         category === cat.value
-                          ? 'border-indigo-500/60 bg-indigo-500/15 text-indigo-300'
+                          ? 'border-zinc-300/60 bg-zinc-900/15 text-zinc-600'
                           : 'border-black/10 bg-zinc-50 text-zinc-500 hover:border-black/20 hover:text-zinc-900'
                       )}
                     >
@@ -230,7 +230,7 @@ export default function PostJobPage() {
                   {...getRootProps()}
                   className={cn(
                     'rounded-xl border-2 border-dashed p-8 text-center transition-all cursor-pointer',
-                    isDragActive ? 'border-indigo-500 bg-indigo-500/10' : 'border-black/15 hover:border-white/25',
+                    isDragActive ? 'border-zinc-300 bg-zinc-900/10' : 'border-black/15 hover:border-white/25',
                     images.length >= 5 && 'opacity-50 cursor-not-allowed'
                   )}
                 >

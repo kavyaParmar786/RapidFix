@@ -63,7 +63,7 @@ export default function FeedPage() {
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-2xl font-bold text-zinc-900" style={{ fontFamily: 'var(--font-syne)' }}>
+              <h1 className="text-2xl font-bold text-zinc-900" style={{ fontFamily: 'var(--font-sans)' }}>
                 Job Feed
               </h1>
               <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
@@ -91,7 +91,7 @@ export default function FeedPage() {
               className={cn(
                 'flex-shrink-0 rounded-full px-4 py-1.5 text-sm font-medium transition-all',
                 filter === 'all'
-                  ? 'bg-indigo-500/30 border border-indigo-500/50 text-indigo-300'
+                  ? 'bg-zinc-900/30 border border-zinc-300/50 text-zinc-600'
                   : 'border border-black/10 bg-zinc-50 text-zinc-500 hover:text-zinc-900'
               )}
             >
@@ -104,7 +104,7 @@ export default function FeedPage() {
                 className={cn(
                   'flex-shrink-0 flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium transition-all',
                   filter === cat.value
-                    ? 'bg-indigo-500/30 border border-indigo-500/50 text-indigo-300'
+                    ? 'bg-zinc-900/30 border border-zinc-300/50 text-zinc-600'
                     : 'border border-black/10 bg-zinc-50 text-zinc-500 hover:text-zinc-900'
                 )}
               >

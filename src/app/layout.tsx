@@ -6,7 +6,7 @@ import { Toaster } from 'react-hot-toast'
 
 const syne = Syne({
   subsets: ['latin'],
-  variable: '--font-syne',
+  variable: '--font-sans',
   display: 'swap',
   weight: ['400', '500', '600', '700', '800'],
 })

@@ -92,7 +92,7 @@ export default function RoleSelectPage() {
         <div className="relative h-14 w-14 mx-auto mb-6 overflow-hidden rounded-2xl bg-transparent">
           <Image src="/logo.png" alt="RapidFix" fill className="object-contain" />
         </div>
-        <h1 className="text-3xl font-bold text-zinc-900 mb-2" style={{ fontFamily: 'var(--font-syne)' }}>
+        <h1 className="text-3xl font-bold text-zinc-900 mb-2" style={{ fontFamily: 'var(--font-sans)' }}>
           How will you use RapidFix?
         </h1>
         <p className="text-sm mb-10" style={{ color: 'var(--text-secondary)' }}>
@@ -106,7 +106,7 @@ export default function RoleSelectPage() {
               emoji: '👤',
               title: 'Customer',
               desc: 'Post jobs and hire skilled professionals for home services.',
-              gradient: 'from-indigo-500 to-blue-600',
+              gradient: 'from-zinc-700 to-blue-600',
             },
             {
               value: 'worker' as UserRole,
@@ -119,15 +119,15 @@ export default function RoleSelectPage() {
             <button key={opt.value} onClick={() => setRole(opt.value)}
               className={cn(
                 'glass-card p-6 text-left transition-all duration-300',
-                role === opt.value ? 'border-indigo-500/60 shadow-lg shadow-indigo-500/20' : 'hover:border-black/20'
+                role === opt.value ? 'border-zinc-300/60 shadow-lg shadow-indigo-500/20' : 'hover:border-black/20'
               )}>
               <div className={cn('h-12 w-12 rounded-2xl bg-gradient-to-br flex items-center justify-center text-2xl mb-4', opt.gradient)}>
                 {opt.emoji}
               </div>
-              <h3 className="font-bold text-zinc-900 mb-1" style={{ fontFamily: 'var(--font-syne)' }}>{opt.title}</h3>
+              <h3 className="font-bold text-zinc-900 mb-1" style={{ fontFamily: 'var(--font-sans)' }}>{opt.title}</h3>
               <p className="text-xs leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{opt.desc}</p>
               {role === opt.value && (
-                <div className="mt-3 h-0.5 w-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500" />
+                <div className="mt-3 h-0.5 w-full rounded-full bg-gradient-to-r from-zinc-700 to-zinc-900" />
               )}
             </button>
           ))}

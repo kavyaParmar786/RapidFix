@@ -62,7 +62,7 @@ export default function CustomerDashboard() {
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-2xl font-bold text-zinc-900" style={{ fontFamily: 'var(--font-syne)' }}>
+              <h1 className="text-2xl font-bold text-zinc-900" style={{ fontFamily: 'var(--font-sans)' }}>
                 Welcome, {profile?.displayName?.split(' ')[0]} 👋
               </h1>
               <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
@@ -77,7 +77,7 @@ export default function CustomerDashboard() {
           {/* Stats */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             {[
-              { icon: Briefcase, label: 'Total Jobs', value: stats.total, color: 'text-indigo-400', bg: 'from-indigo-500/20 to-indigo-600/10' },
+              { icon: Briefcase, label: 'Total Jobs', value: stats.total, color: 'text-zinc-500', bg: 'from-zinc-700/20 to-indigo-600/10' },
               { icon: TrendingUp, label: 'Active', value: stats.active, color: 'text-yellow-400', bg: 'from-yellow-500/20 to-yellow-600/10' },
               { icon: CheckCircle, label: 'Completed', value: stats.completed, color: 'text-green-400', bg: 'from-green-500/20 to-green-600/10' },
               { icon: MessageCircle, label: 'Chats', value: stats.unreadChats, color: 'text-cyan-400', bg: 'from-cyan-500/20 to-cyan-600/10' },
@@ -85,7 +85,7 @@ export default function CustomerDashboard() {
               <div key={label} className={`glass-card p-5 bg-gradient-to-br ${bg}`}>
                 <div className="flex items-center justify-between mb-3">
                   <Icon size={18} className={color} />
-                  <span className={`text-2xl font-bold ${color}`} style={{ fontFamily: 'var(--font-syne)' }}>
+                  <span className={`text-2xl font-bold ${color}`} style={{ fontFamily: 'var(--font-sans)' }}>
                     {value}
                   </span>
                 </div>
@@ -105,7 +105,7 @@ export default function CustomerDashboard() {
                     onClick={() => setActiveTab(t.key)}
                     className={`flex-shrink-0 rounded-lg px-4 py-2 text-sm font-medium transition-all ${
                       activeTab === t.key
-                        ? 'bg-gradient-to-r from-indigo-500 to-violet-600 text-zinc-900 shadow'
+                        ? 'bg-gradient-to-r from-zinc-700 to-violet-600 text-zinc-900 shadow'
                         : 'text-zinc-500 hover:text-zinc-900'
                     }`}
                   >
@@ -139,7 +139,7 @@ export default function CustomerDashboard() {
 
             {/* Sidebar: Recent Chats */}
             <div>
-              <h2 className="font-semibold text-zinc-900 mb-4" style={{ fontFamily: 'var(--font-syne)' }}>
+              <h2 className="font-semibold text-zinc-900 mb-4" style={{ fontFamily: 'var(--font-sans)' }}>
                 Recent Chats
               </h2>
               <div className="space-y-3">
@@ -155,7 +155,7 @@ export default function CustomerDashboard() {
                       href={`/chat/${chat.id}`}
                       className="glass-card flex items-center gap-3 p-4 transition-all hover:border-black/20 hover:bg-zinc-50"
                     >
-                      <div className="h-9 w-9 rounded-full bg-indigo-500/30 flex items-center justify-center text-sm font-bold text-indigo-300 flex-shrink-0">
+                      <div className="h-9 w-9 rounded-full bg-zinc-900/30 flex items-center justify-center text-sm font-bold text-zinc-600 flex-shrink-0">
                         {chat.workerName?.[0]}
                       </div>
                       <div className="flex-1 min-w-0">

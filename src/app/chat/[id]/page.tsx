@@ -133,7 +133,7 @@ export default function ChatPage() {
 
           <div className="flex items-center gap-2.5 flex-1 min-w-0">
             <div className="relative">
-              <div className="h-9 w-9 overflow-hidden rounded-full bg-indigo-500/30 flex items-center justify-center text-sm font-bold text-indigo-300 flex-shrink-0">
+              <div className="h-9 w-9 overflow-hidden rounded-full bg-zinc-900/30 flex items-center justify-center text-sm font-bold text-zinc-600 flex-shrink-0">
                 {otherPhoto ? (
                   <Image src={otherPhoto} alt="" width={36} height={36} className="object-cover rounded-full" />
                 ) : (
@@ -162,7 +162,7 @@ export default function ChatPage() {
         <div className="flex-1 overflow-y-auto px-4 py-4 space-y-6">
           {messages.length === 0 && (
             <div className="flex flex-col items-center justify-center h-full gap-3 py-12">
-              <div className="h-16 w-16 rounded-2xl bg-indigo-500/20 flex items-center justify-center text-3xl">
+              <div className="h-16 w-16 rounded-2xl bg-zinc-900/20 flex items-center justify-center text-3xl">
                 💬
               </div>
               <p className="font-medium text-zinc-900">Start the conversation</p>
@@ -188,7 +188,7 @@ export default function ChatPage() {
                     <div key={msg.id} className={cn('flex gap-2', isMe && 'flex-row-reverse')}>
                       {/* Avatar */}
                       {!isMe && (
-                        <div className="h-7 w-7 rounded-full bg-indigo-500/30 flex items-center justify-center text-xs font-bold text-indigo-300 flex-shrink-0 self-end">
+                        <div className="h-7 w-7 rounded-full bg-zinc-900/30 flex items-center justify-center text-xs font-bold text-zinc-600 flex-shrink-0 self-end">
                           {msg.senderPhoto ? (
                             <Image src={msg.senderPhoto} alt="" width={28} height={28} className="rounded-full object-cover" />
                           ) : (
@@ -202,7 +202,7 @@ export default function ChatPage() {
                           className={cn(
                             'rounded-2xl px-4 py-2.5 text-sm shadow-sm',
                             isMe
-                              ? 'rounded-br-sm bg-gradient-to-br from-indigo-500 to-violet-600 text-zinc-900'
+                              ? 'rounded-br-sm bg-gradient-to-br from-zinc-700 to-violet-600 text-zinc-900'
                               : 'rounded-bl-sm bg-zinc-100 text-zinc-900 border border-black/10'
                           )}
                         >
@@ -215,7 +215,7 @@ export default function ChatPage() {
                         </div>
                         <span className="mt-1 text-[10px] px-1" style={{ color: 'var(--text-muted)' }}>
                           {new Date(msg.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
-                          {isMe && <CheckCheck size={11} className="inline ml-1 text-indigo-300" />}
+                          {isMe && <CheckCheck size={11} className="inline ml-1 text-zinc-600" />}
                         </span>
                       </div>
                     </div>
@@ -271,7 +271,7 @@ export default function ChatPage() {
               'flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl transition-all',
               sending || (!text.trim() && !imageFile)
                 ? 'bg-zinc-100 text-zinc-400 cursor-not-allowed'
-                : 'bg-gradient-to-br from-indigo-500 to-violet-600 text-zinc-900 hover:shadow-lg hover:shadow-indigo-500/30'
+                : 'bg-gradient-to-br from-zinc-700 to-violet-600 text-zinc-900 hover:shadow-lg hover:shadow-indigo-500/30'
             )}
           >
             <Send size={16} />

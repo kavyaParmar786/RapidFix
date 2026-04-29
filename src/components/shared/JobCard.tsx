@@ -71,11 +71,11 @@ export default function JobCard({ job, showAccept, viewAs, onAccept, accepting }
       {/* Meta */}
       <div className="flex flex-wrap items-center gap-3 text-xs mb-4" style={{ color: 'var(--text-secondary)' }}>
         <span className="flex items-center gap-1">
-          <MapPin size={11} className="text-indigo-400" />
+          <MapPin size={11} className="text-zinc-500" />
           {job.location}
         </span>
         <span className="flex items-center gap-1">
-          <Clock size={11} className="text-indigo-400" />
+          <Clock size={11} className="text-zinc-500" />
           {formatRelativeTime(job.createdAt)}
         </span>
         {job.budget && (
@@ -92,7 +92,7 @@ export default function JobCard({ job, showAccept, viewAs, onAccept, accepting }
       {/* Customer info */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="h-6 w-6 overflow-hidden rounded-full bg-indigo-500 flex-shrink-0">
+          <div className="h-6 w-6 overflow-hidden rounded-full bg-zinc-900 flex-shrink-0">
             {job.customerPhoto ? (
               <Image src={job.customerPhoto} alt="" width={24} height={24} className="object-cover" />
             ) : (
@@ -112,7 +112,7 @@ export default function JobCard({ job, showAccept, viewAs, onAccept, accepting }
               'flex items-center gap-1.5 rounded-lg px-4 py-1.5 text-sm font-semibold transition-all',
               accepting
                 ? 'bg-zinc-100 text-zinc-400 cursor-not-allowed'
-                : 'bg-gradient-to-r from-indigo-500 to-violet-600 text-zinc-900 hover:shadow-lg hover:shadow-indigo-500/30 hover:scale-105'
+                : 'bg-gradient-to-r from-zinc-700 to-violet-600 text-zinc-900 hover:shadow-lg hover:shadow-indigo-500/30 hover:scale-105'
             )}
           >
             <CheckCircle size={13} />

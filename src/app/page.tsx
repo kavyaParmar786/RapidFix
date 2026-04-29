@@ -5,7 +5,6 @@ import CategoriesSection from './components/CategoriesSection'
 import HowItWorksSection from './components/HowItWorksSection'
 import TestimonialsSection from './components/TestimonialsSection'
 import CTASection from './components/CTASection'
-import StatsSection from './components/StatsSection'
 
 export default function HomePage() {
   return (
@@ -13,7 +12,6 @@ export default function HomePage() {
       <Navbar />
       <main>
         <HeroSection />
-        <StatsSection />
         <CategoriesSection />
         <HowItWorksSection />
         <TestimonialsSection />
