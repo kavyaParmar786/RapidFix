@@ -8,10 +8,12 @@ import { useAuth } from '@/lib/auth-context'
 import { subscribeToWorkerJobs, subscribeToChats } from '@/lib/firestore'
 import { Job, Chat } from '@/types'
 import { formatRelativeTime } from '@/lib/utils'
-import { PageLoader } from '@/components/ui/Spinner'
+import { DashboardSkeleton } from '@/components/ui/Skeletons'
 import JobCard from '@/components/shared/JobCard'
 import Navbar from '@/components/layout/Navbar'
 import EarningsTab from '@/components/shared/EarningsTab'
+import WorkerOnboarding from '@/components/shared/WorkerOnboarding'
+import { AnimatePresence } from 'framer-motion'
 import toast from 'react-hot-toast'
 
 export default function WorkerDashboard() {
@@ -20,12 +22,16 @@ export default function WorkerDashboard() {
   const [chats, setChats] = useState<Chat[]>([])
   const [tab, setTab] = useState<'active' | 'completed' | 'earnings'>('active')
   const [toggling, setToggling] = useState(false)
+  const [showOnboarding, setShowOnboarding] = useState(false)
 
   useEffect(() => {
     if (authLoading) return
     if (!user) { window.location.href = '/auth/login'; return }
     if (!profile) return
     if (profile.role !== 'worker') window.location.href = '/dashboard/customer'
+    if (profile.role === 'worker' && !profile.category && !localStorage.getItem('rf-onboarding-done')) {
+      setShowOnboarding(true)
+    }
   }, [authLoading, user, profile])
 
   useEffect(() => {
@@ -35,7 +41,7 @@ export default function WorkerDashboard() {
     return () => { unsub1(); unsub2() }
   }, [user, profile])
 
-  if (authLoading || !profile) return <PageLoader />
+  if (authLoading || !profile) return <><Navbar /><div className='min-h-screen pt-16' style={{background:'var(--bg-base)'}}><div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10'><DashboardSkeleton /></div></div></>
 
   const toggleAvailability = async () => {
     setToggling(true)
@@ -168,6 +174,14 @@ export default function WorkerDashboard() {
           </div>
         </div>
       </div>
+      <AnimatePresence>
+        {showOnboarding && (
+          <WorkerOnboarding onComplete={() => {
+            localStorage.setItem('rf-onboarding-done', '1')
+            setShowOnboarding(false)
+          }} />
+        )}
+      </AnimatePresence>
     </>
   )
 }

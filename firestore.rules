@@ -1,81 +1,87 @@
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ─── USERS ───────────────────────────────────────────────────────
-    match /users/{userId} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null && request.auth.uid == userId;
-      allow update: if request.auth != null && request.auth.uid == userId;
-      allow delete: if false;
+    function isAuth() { return request.auth != null; }
+    function isUser(uid) { return isAuth() && request.auth.uid == uid; }
+    function getUserData(uid) { return get(/databases/$(database)/documents/users/$(uid)).data; }
+    function isWorker() { return isAuth() && getUserData(request.auth.uid).role == 'worker'; }
+    function isCustomer() { return isAuth() && getUserData(request.auth.uid).role == 'customer'; }
+    function isAdmin() { return isAuth() && getUserData(request.auth.uid).role == 'admin'; }
+
+    // Users — anyone auth can read; only own profile can write
+    match /users/{uid} {
+      allow read: if isAuth();
+      allow create: if isUser(uid);
+      allow update: if isUser(uid) || isAdmin();
+      allow delete: if isAdmin();
     }
 
-    // ─── JOBS ────────────────────────────────────────────────────────
+    // Jobs
     match /jobs/{jobId} {
-      // Anyone authenticated can read jobs
-      allow read: if request.auth != null;
-
-      // Only customers can create jobs
-      allow create: if request.auth != null
+      allow read: if isAuth();
+      allow create: if isCustomer()
         && request.resource.data.customerId == request.auth.uid
-        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'customer'
-        && request.resource.data.status == 'posted';
-
-      // Update rules:
-      // - Customer can cancel their own job (posted → cancelled)
-      // - Customer or Worker can change status in valid flow
-      // - Worker acceptance is handled via Cloud Functions / transactions
-      allow update: if request.auth != null && (
-        // Customer updating their own job
-        (resource.data.customerId == request.auth.uid) ||
-        // Worker updating job they accepted
-        (resource.data.workerId == request.auth.uid) ||
-        // Any worker accepting a posted job (atomic transaction)
-        (resource.data.status == 'posted'
-          && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'worker')
-      );
-
-      allow delete: if false;
+        && request.resource.data.status == 'posted'
+        && request.resource.data.title.size() > 0;
+      allow update: if isAdmin()
+        || (isUser(resource.data.customerId) && resource.data.status in ['posted','accepted'])
+        || (isWorker() && (
+             (resource.data.status == 'posted' && request.resource.data.workerId == request.auth.uid)
+             || (resource.data.workerId == request.auth.uid && resource.data.status in ['accepted','in_progress'])
+           ));
+      allow delete: if isAdmin() || isUser(resource.data.customerId);
     }
 
-    // ─── CHATS ───────────────────────────────────────────────────────
+    // Chats
     match /chats/{chatId} {
-      // Only participants can read/write
-      allow read, write: if request.auth != null
-        && (resource.data.customerId == request.auth.uid
-            || resource.data.workerId == request.auth.uid);
-
-      // Chat creation allowed in job acceptance flow
-      allow create: if request.auth != null;
-
+      allow read: if isAuth() && (resource.data.customerId == request.auth.uid || resource.data.workerId == request.auth.uid || isAdmin());
+      allow create: if isAuth() && (request.resource.data.customerId == request.auth.uid || request.resource.data.workerId == request.auth.uid);
+      allow update: if isAuth() && (resource.data.customerId == request.auth.uid || resource.data.workerId == request.auth.uid);
       match /messages/{messageId} {
-        allow read: if request.auth != null
-          && (get(/databases/$(database)/documents/chats/$(chatId)).data.customerId == request.auth.uid
-              || get(/databases/$(database)/documents/chats/$(chatId)).data.workerId == request.auth.uid);
-
-        allow create: if request.auth != null
-          && request.resource.data.senderId == request.auth.uid
-          && (get(/databases/$(database)/documents/chats/$(chatId)).data.customerId == request.auth.uid
-              || get(/databases/$(database)/documents/chats/$(chatId)).data.workerId == request.auth.uid);
-
+        allow read: if isAuth() && (get(/databases/$(database)/documents/chats/$(chatId)).data.customerId == request.auth.uid || get(/databases/$(database)/documents/chats/$(chatId)).data.workerId == request.auth.uid || isAdmin());
+        allow create: if isAuth() && request.resource.data.senderId == request.auth.uid;
         allow update, delete: if false;
       }
     }
 
-    // ─── NOTIFICATIONS ───────────────────────────────────────────────
+    // Reviews — authenticated users read; creator can create once
+    match /reviews/{reviewId} {
+      allow read: if isAuth();
+      allow create: if isAuth() && request.resource.data.reviewerId == request.auth.uid && request.resource.data.rating >= 1 && request.resource.data.rating <= 5;
+      allow update, delete: if isAdmin();
+    }
+
+    // Notifications — only the recipient
     match /notifications/{notifId} {
-      allow read, update: if request.auth != null
-        && resource.data.userId == request.auth.uid;
-      allow create: if request.auth != null;
+      allow read, update, delete: if isAuth() && resource.data.userId == request.auth.uid;
+      allow create: if isAuth();
+    }
+
+    // Payments — server-side only (Cloud Functions), read by parties
+    match /payments/{paymentId} {
+      allow read: if isAuth() && (resource.data.customerId == request.auth.uid || resource.data.workerId == request.auth.uid || isAdmin());
+      allow write: if isAdmin();
+    }
+
+    // Promo codes — read for auth users, write admin only
+    match /promoCodes/{codeId} {
+      allow read: if isAuth();
+      allow write: if isAdmin();
+    }
+
+    // Referrals
+    match /referrals/{referralId} {
+      allow read: if isAuth() && resource.data.userId == request.auth.uid;
+      allow create: if isAuth() && request.resource.data.userId == request.auth.uid;
+      allow update: if isAdmin();
       allow delete: if false;
     }
 
-    // ─── REVIEWS ─────────────────────────────────────────────────────
-    match /reviews/{reviewId} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null
-        && request.resource.data.reviewerId == request.auth.uid;
-      allow update, delete: if false;
+    // Block everything else
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

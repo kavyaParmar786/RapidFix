@@ -11,7 +11,9 @@ import { Job } from '@/types'
 import { cn, getCategoryConfig, STATUS_CONFIG, URGENCY_CONFIG, formatRelativeTime } from '@/lib/utils'
 import { PageLoader } from '@/components/ui/Spinner'
 import ReviewModal from '@/components/shared/ReviewModal'
-import { AnimatePresence } from 'framer-motion'
+import JobStatusTimeline from '@/components/shared/JobStatusTimeline'
+import CancelJobDialog from '@/components/shared/CancelJobDialog'
+import { motion, AnimatePresence } from 'framer-motion'
 import StarRating from '@/components/ui/StarRating'
 import Navbar from '@/components/layout/Navbar'
 import toast from 'react-hot-toast'
@@ -27,6 +29,7 @@ export default function JobDetailPage() {
   const [rating, setRating] = useState(5)
   const [comment, setComment] = useState('')
   const [reviewSent, setReviewSent] = useState(false)
+  const [showCancel, setShowCancel] = useState(false)
 
   useEffect(() => {
     if (!id) return
@@ -43,7 +46,6 @@ export default function JobDetailPage() {
     </div>
   )
 
-  const j = job
   const cat = getCategoryConfig(job.category)
   const status = STATUS_CONFIG[job.status]
   const urgency = URGENCY_CONFIG[job.urgency]
@@ -127,6 +129,8 @@ export default function JobDetailPage() {
             </p>
           </div>
 
+          <JobStatusTimeline job={job} />
+
           {/* Images */}
           {job.images && job.images.length > 0 && (
             <div className="glass-card p-6 mb-5">
@@ -197,14 +201,15 @@ export default function JobDetailPage() {
                 Mark as Done
               </button>
             )}
-            {isCustomer && job.status === 'posted' && (
-              <button
-                onClick={() => handleStatusChange('cancelled')}
+            {isCustomer && (job.status === 'posted' || job.status === 'accepted') && (
+              <motion.button
+                whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
+                onClick={() => setShowCancel(true)}
                 disabled={actionLoading}
                 className="flex items-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-5 py-2.5 text-sm font-medium text-red-400 transition-all hover:bg-red-500/20"
               >
                 Cancel Job
-              </button>
+              </motion.button>
             )}
           </div>
 
@@ -230,24 +235,23 @@ export default function JobDetailPage() {
             />
           )}
           </AnimatePresence>
-          {showReview && isCustomer && !reviewSent && (
-            <div className="glass-card p-6 mt-5 border-[var(--border-strong)]/30">
-              <h2 className="font-semibold text-[var(--text-primary)] mb-4">Rate {j.workerName}</h2>
-              <StarRating value={rating} onChange={setRating} size={28} />
-              <textarea
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                placeholder="Share your experience…"
-                rows={3}
-                className="input-base mt-4 text-sm resize-none"
-              />
-              <div className="flex gap-3 mt-4">
-                <button onClick={handleReviewSubmit} className="btn-primary text-sm">Submit Review</button>
-                <button onClick={() => setShowReview(false)} className="btn-secondary text-sm">Skip</button>
-              </div>
-            </div>
-          )}
+
         </div>
+
+          {/* Cancel dialog */}
+          <AnimatePresence>
+            {showCancel && (
+              <CancelJobDialog
+                jobTitle={job.title}
+                onConfirm={async (reason) => {
+                  await handleStatusChange('cancelled')
+                  setShowCancel(false)
+                }}
+                onClose={() => setShowCancel(false)}
+                isWorker={isWorker}
+              />
+            )}
+          </AnimatePresence>
       </div>
     </>
   )

@@ -9,7 +9,7 @@ import { useAuth } from '@/lib/auth-context'
 import { subscribeToCustomerJobs, subscribeToChats } from '@/lib/firestore'
 import { Job, Chat } from '@/types'
 import { STATUS_CONFIG, formatRelativeTime, getCategoryConfig } from '@/lib/utils'
-import { PageLoader } from '@/components/ui/Spinner'
+import { DashboardSkeleton } from '@/components/ui/Skeletons'
 import JobCard from '@/components/shared/JobCard'
 import Navbar from '@/components/layout/Navbar'
 
@@ -36,7 +36,7 @@ export default function CustomerDashboard() {
     return () => { unsub1(); unsub2() }
   }, [user])
 
-  if (authLoading || !profile) return <PageLoader />
+  if (authLoading || !profile) return <><Navbar /><div className='min-h-screen pt-16' style={{background:'var(--bg-base)'}}><div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10'><DashboardSkeleton /></div></div></>
 
   const filteredJobs = activeTab === 'all' ? jobs : jobs.filter(j => j.status === activeTab)
   const stats = {

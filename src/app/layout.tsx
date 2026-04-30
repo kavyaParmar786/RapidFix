@@ -1,10 +1,11 @@
-import type { Metadata, Viewport } from 'next'
+import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import '@/styles/globals.css'
 import { AuthProvider } from '@/lib/auth-context'
 import { ThemeProvider } from '@/lib/theme-context'
 import { Toaster } from 'react-hot-toast'
 import CookieBanner from '@/components/ui/CookieBanner'
+import BottomNav from '@/components/layout/BottomNav'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -18,6 +19,8 @@ export const metadata: Metadata = {
   keywords: ['home services', 'repair', 'electrician', 'plumber', 'handyman', 'on-demand'],
   icons: { icon: '/logo.png', apple: '/logo.png' },
   manifest: '/manifest.json',
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=5',
+  themeColor: [{ media: '(prefers-color-scheme: dark)', color: '#09090b' }, { media: '(prefers-color-scheme: light)', color: '#ffffff' }],
   openGraph: {
     title: 'RapidFix — Home Services On Demand',
     description: 'Connect with skilled local professionals instantly',
@@ -25,15 +28,16 @@ export const metadata: Metadata = {
   },
 }
 
-export const viewport: Viewport = {
-  width: 'device-width',
-  initialScale: 1,
-  maximumScale: 5,
-  themeColor: [
-    { media: '(prefers-color-scheme: dark)', color: '#09090b' },
-    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-  ],
+// Injected before React hydrates — reads localStorage and applies
+// the correct theme class synchronously to <html> to prevent flash.
+const swScript = `
+// Register service worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/sw.js').catch(function() {});
+  });
 }
+`
 
 const themeScript = `
 (function () {
@@ -56,13 +60,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning>
       <head>
+        {/* Blocking script — must run before first paint to avoid theme flash */}
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <script dangerouslySetInnerHTML={{ __html: swScript }} />
       </head>
-      <body>
+      <body className="pb-safe">
         <ThemeProvider>
           <AuthProvider>
             {children}
             <CookieBanner />
+            <BottomNav />
             <Toaster
               position="top-right"
               toastOptions={{

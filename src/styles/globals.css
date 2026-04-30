@@ -163,3 +163,9 @@ html.theme-switching * {
     to { transform: translate(-50%, -50%) scale(4); opacity: 0; }
   }
 }
+
+/* Bottom nav safe area for mobile */
+@media (max-width: 768px) {
+  body { padding-bottom: calc(64px + env(safe-area-inset-bottom)); }
+}
+.pb-safe { padding-bottom: env(safe-area-inset-bottom); }
