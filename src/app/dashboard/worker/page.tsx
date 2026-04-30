@@ -29,7 +29,7 @@ export default function WorkerDashboard() {
     if (!user) { window.location.href = '/auth/login'; return }
     if (!profile) return
     if (profile.role !== 'worker') window.location.href = '/dashboard/customer'
-    if (profile.role === 'worker' && !profile.category && !localStorage.getItem('rf-onboarding-done')) {
+    if (profile.role === 'worker' && (!profile.skills || profile.skills.length === 0) && !localStorage.getItem('rf-onboarding-done')) {
       setShowOnboarding(true)
     }
   }, [authLoading, user, profile])
