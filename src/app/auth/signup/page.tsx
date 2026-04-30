@@ -17,7 +17,10 @@ function OrbBackground() {
   const orb1Y = useTransform(mouseY, [0, 1], [-15, 15])
 
   useEffect(() => {
-    const h = (e: MouseEvent) => { mouseX.set(e.clientX / window.innerWidth); mouseY.set(e.clientY / window.innerHeight) }
+    const h = (e: MouseEvent) => {
+      mouseX.set(e.clientX / window.innerWidth)
+      mouseY.set(e.clientY / window.innerHeight)
+    }
     window.addEventListener('mousemove', h)
     return () => window.removeEventListener('mousemove', h)
   }, [mouseX, mouseY])
@@ -53,8 +56,10 @@ function SignupForm() {
   const [focusedField, setFocusedField] = useState<string | null>(null)
   const [agreedToTerms, setAgreedToTerms] = useState(false)
 
-  // role is inferred from the URL param — no need to show a selector
   const role: UserRole = defaultRole
+
+  const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.07, delayChildren: 0.05 } } }
+  const fadeUp = { hidden: { opacity: 0, y: 18, filter: 'blur(4px)' }, show: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } } }
 
   const handleGoogle = async () => {
     setGoogleLoading(true)
@@ -73,9 +78,6 @@ function SignupForm() {
     catch (err: any) { toast.error(err.message || 'Sign-up failed') }
     finally { setLoading(false) }
   }
-
-  const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.07, delayChildren: 0.05 } } }
-  const fadeUp = { hidden: { opacity: 0, y: 18, filter: 'blur(4px)' }, show: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } } }
 
   if (done) return (
     <div className="min-h-screen flex items-center justify-center px-4 relative" style={{ background: 'var(--bg-base)' }}>
@@ -101,7 +103,6 @@ function SignupForm() {
       </motion.div>
     </div>
   )
-
 
   return (
     <div className="min-h-screen flex items-center justify-center relative px-4 py-16" style={{ background: 'var(--bg-base)' }}>
@@ -132,7 +133,6 @@ function SignupForm() {
           <div className="absolute -top-px -left-px w-40 h-40 rounded-br-full opacity-30"
             style={{ background: 'radial-gradient(circle at top left, var(--bg-overlay), transparent)' }} />
 
-          {/* Header */}
           <div className="mb-6 relative">
             <h1 className="text-2xl font-bold mb-1.5" style={{ color: 'var(--text-primary)' }}>Create account</h1>
             <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Join 50,000+ users on RapidFix</p>
@@ -190,13 +190,15 @@ function SignupForm() {
               </div>
             </div>
 
-            <motion.button type="submit" disabled={loading}
-              whileHover={{ scale: 1.015 }} whileTap={{ scale: 0.98 }}
-              <div className="flex items-start gap-2.5 py-1">
+            <div className="flex items-start gap-2.5 py-1">
               <button type="button" onClick={() => setAgreedToTerms(!agreedToTerms)}
                 className="mt-0.5 w-4 h-4 rounded flex items-center justify-center shrink-0 transition-all border"
                 style={{ background: agreedToTerms ? 'var(--accent)' : 'transparent', borderColor: agreedToTerms ? 'var(--accent)' : 'var(--border-strong)' }}>
-                {agreedToTerms && <svg width="9" height="7" viewBox="0 0 9 7" fill="none"><path d="M1 3.5L3.5 6L8 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{color:'var(--bg-base)'}}/></svg>}
+                {agreedToTerms && (
+                  <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
+                    <path d="M1 3.5L3.5 6L8 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--bg-base)' }} />
+                  </svg>
+                )}
               </button>
               <p className="text-xs leading-relaxed" style={{ color: 'var(--text-muted)' }}>
                 I agree to the{' '}
@@ -205,7 +207,10 @@ function SignupForm() {
                 <Link href="/privacy" className="underline underline-offset-2 hover:text-[var(--text-primary)]">Privacy Policy</Link>
               </p>
             </div>
-                        className="btn-primary w-full py-3 rounded-xl mt-1 text-sm font-semibold">
+
+            <motion.button type="submit" disabled={loading}
+              whileHover={{ scale: 1.015 }} whileTap={{ scale: 0.98 }}
+              className="btn-primary w-full py-3 rounded-xl mt-1 text-sm font-semibold">
               {loading
                 ? <><div className="h-4 w-4 rounded-full border-2 border-current/30 border-t-current animate-spin mr-2 inline-block" />Creating…</>
                 : <>Create account <ArrowRight size={14} className="ml-1.5 inline" /></>}
