@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import '@/styles/globals.css'
 import { AuthProvider } from '@/lib/auth-context'
@@ -18,8 +18,6 @@ export const metadata: Metadata = {
   keywords: ['home services', 'repair', 'electrician', 'plumber', 'handyman', 'on-demand'],
   icons: { icon: '/logo.png', apple: '/logo.png' },
   manifest: '/manifest.json',
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=5',
-  themeColor: [{ media: '(prefers-color-scheme: dark)', color: '#09090b' }, { media: '(prefers-color-scheme: light)', color: '#ffffff' }],
   openGraph: {
     title: 'RapidFix — Home Services On Demand',
     description: 'Connect with skilled local professionals instantly',
@@ -27,8 +25,16 @@ export const metadata: Metadata = {
   },
 }
 
-// Injected before React hydrates — reads localStorage and applies
-// the correct theme class synchronously to <html> to prevent flash.
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: [
+    { media: '(prefers-color-scheme: dark)', color: '#09090b' },
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+  ],
+}
+
 const themeScript = `
 (function () {
   try {
@@ -50,7 +56,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={inter.variable} suppressHydrationWarning>
       <head>
-        {/* Blocking script — must run before first paint to avoid theme flash */}
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body>
