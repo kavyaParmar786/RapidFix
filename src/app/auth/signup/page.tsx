@@ -74,6 +74,9 @@ function SignupForm() {
     finally { setLoading(false) }
   }
 
+  const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.07, delayChildren: 0.05 } } }
+  const fadeUp = { hidden: { opacity: 0, y: 18, filter: 'blur(4px)' }, show: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } } }
+
   if (done) return (
     <div className="min-h-screen flex items-center justify-center px-4 relative" style={{ background: 'var(--bg-base)' }}>
       <OrbBackground />
@@ -99,8 +102,6 @@ function SignupForm() {
     </div>
   )
 
-  const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.07, delayChildren: 0.05 } } }
-  const fadeUp = { hidden: { opacity: 0, y: 18, filter: 'blur(4px)' }, show: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } } }
 
   return (
     <div className="min-h-screen flex items-center justify-center relative px-4 py-16" style={{ background: 'var(--bg-base)' }}>
