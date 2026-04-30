@@ -43,7 +43,6 @@ export default function JobDetailPage() {
     </div>
   )
 
-  const j = job
   const cat = getCategoryConfig(job.category)
   const status = STATUS_CONFIG[job.status]
   const urgency = URGENCY_CONFIG[job.urgency]
@@ -230,9 +229,9 @@ export default function JobDetailPage() {
             />
           )}
           </AnimatePresence>
-          {showReview && isCustomer && !reviewSent && (
+          {false && showReview && isCustomer && !reviewSent && job && (
             <div className="glass-card p-6 mt-5 border-[var(--border-strong)]/30">
-              <h2 className="font-semibold text-[var(--text-primary)] mb-4">Rate {j.workerName}</h2>
+              <h2 className="font-semibold text-[var(--text-primary)] mb-4">Rate {job.workerName}</h2>
               <StarRating value={rating} onChange={setRating} size={28} />
               <textarea
                 value={comment}
