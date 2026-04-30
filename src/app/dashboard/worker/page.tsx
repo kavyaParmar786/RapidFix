@@ -11,13 +11,14 @@ import { formatRelativeTime } from '@/lib/utils'
 import { PageLoader } from '@/components/ui/Spinner'
 import JobCard from '@/components/shared/JobCard'
 import Navbar from '@/components/layout/Navbar'
+import EarningsTab from '@/components/shared/EarningsTab'
 import toast from 'react-hot-toast'
 
 export default function WorkerDashboard() {
   const { user, profile, updateUserProfile, loading: authLoading } = useAuth()
   const [myJobs, setMyJobs] = useState<Job[]>([])
   const [chats, setChats] = useState<Chat[]>([])
-  const [tab, setTab] = useState<'active' | 'completed'>('active')
+  const [tab, setTab] = useState<'active' | 'completed' | 'earnings'>('active')
   const [toggling, setToggling] = useState(false)
 
   useEffect(() => {
@@ -57,14 +58,14 @@ export default function WorkerDashboard() {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen pt-14 bg-white">
+      <div className="min-h-screen pt-14 bg-[var(--bg-base)]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
 
           {/* Header */}
           <div className="flex items-start sm:items-center justify-between gap-4 flex-wrap mb-8 pb-6 border-b border-black/[0.06]">
             <div>
-              <h1 className="text-xl font-bold text-zinc-900 mb-0.5">Worker Dashboard</h1>
-              <p className="text-sm text-zinc-400">
+              <h1 className="text-xl font-bold text-[var(--text-primary)] mb-0.5">Worker Dashboard</h1>
+              <p className="text-sm text-[var(--text-muted)]">
                 {profile.isAvailable ? 'You\'re Online — visible to customers' : 'You\'re Offline — toggle to receive jobs'}
               </p>
             </div>
@@ -76,8 +77,8 @@ export default function WorkerDashboard() {
               <button onClick={toggleAvailability} disabled={toggling}
                 className={`flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-semibold transition-all border ${
                   profile.isAvailable
-                    ? 'bg-white/[0.06] border-black/20 text-zinc-900'
-                    : 'bg-white/[0.03] border-black/10 text-zinc-400 hover:text-zinc-600'
+                    ? 'bg-white/[0.06] border-black/20 text-[var(--text-primary)]'
+                    : 'bg-white/[0.03] border-black/10 text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
                 }`}>
                 {profile.isAvailable ? <ToggleRight size={14} /> : <ToggleLeft size={14} />}
                 {profile.isAvailable ? 'Online' : 'Offline'}
@@ -88,12 +89,12 @@ export default function WorkerDashboard() {
           {/* Stats */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
             {stats.map(({ icon: Icon, label, value }) => (
-              <div key={label} className="rounded-xl border border-black/[0.07] bg-zinc-50 p-4">
+              <div key={label} className="rounded-xl border border-black/[0.07] bg-[var(--bg-surface)] p-4">
                 <div className="flex items-center justify-between mb-3">
-                  <Icon size={14} className="text-zinc-400" />
-                  <span className="text-2xl font-bold text-zinc-900">{value}</span>
+                  <Icon size={14} className="text-[var(--text-muted)]" />
+                  <span className="text-2xl font-bold text-[var(--text-primary)]">{value}</span>
                 </div>
-                <p className="text-xs text-zinc-400">{label}</p>
+                <p className="text-xs text-[var(--text-muted)]">{label}</p>
               </div>
             ))}
           </div>
@@ -105,21 +106,24 @@ export default function WorkerDashboard() {
                 {[{ key: 'active', label: 'Active Jobs' }, { key: 'completed', label: 'Completed' }].map(t => (
                   <button key={t.key} onClick={() => setTab(t.key as 'active' | 'completed')}
                     className={`flex-1 rounded-md py-2 text-xs font-medium transition-all ${
-                      tab === t.key ? 'bg-white text-black' : 'text-zinc-400 hover:text-zinc-900'
+                      tab === t.key ? 'bg-[var(--bg-base)] text-[var(--text-primary)]' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                     }`}>
                     {t.label}
                   </button>
                 ))}
               </div>
 
+              {tab === 'earnings' ? (
+                <EarningsTab />
+              ) : (
               <div className="space-y-3">
                 {displayJobs.length === 0 ? (
-                  <div className="rounded-xl border border-black/[0.07] bg-zinc-50 p-12 text-center">
-                    <Briefcase size={20} className="mx-auto mb-3 text-zinc-300" />
-                    <p className="text-sm font-medium text-zinc-500 mb-1">
+                  <div className="rounded-xl border border-black/[0.07] bg-[var(--bg-surface)] p-12 text-center">
+                    <Briefcase size={20} className="mx-auto mb-3 text-[var(--text-muted)]" />
+                    <p className="text-sm font-medium text-[var(--text-muted)] mb-1">
                       {tab === 'active' ? 'No active jobs' : 'No completed jobs yet'}
                     </p>
-                    <p className="text-xs text-zinc-400 mb-4">
+                    <p className="text-xs text-[var(--text-muted)] mb-4">
                       {tab === 'active' ? 'Accept jobs from Browse Jobs to see them here' : 'Completed jobs will appear here'}
                     </p>
                     {tab === 'active' && (
@@ -132,29 +136,30 @@ export default function WorkerDashboard() {
                   ))
                 )}
               </div>
+              )}
             </div>
 
             {/* Chats sidebar */}
             <div>
-              <h2 className="text-sm font-semibold text-zinc-900 mb-4">Active Chats</h2>
+              <h2 className="text-sm font-semibold text-[var(--text-primary)] mb-4">Active Chats</h2>
               <div className="space-y-2">
                 {chats.length === 0 ? (
-                  <div className="rounded-xl border border-black/[0.07] bg-zinc-50 p-6 text-center">
-                    <MessageCircle size={16} className="mx-auto mb-2 text-zinc-300" />
-                    <p className="text-xs text-zinc-400">No chats yet</p>
+                  <div className="rounded-xl border border-black/[0.07] bg-[var(--bg-surface)] p-6 text-center">
+                    <MessageCircle size={16} className="mx-auto mb-2 text-[var(--text-muted)]" />
+                    <p className="text-xs text-[var(--text-muted)]">No chats yet</p>
                   </div>
                 ) : chats.map(chat => (
                   <Link key={chat.id} href={`/chat/${chat.id}`}
-                    className="flex items-center gap-3 rounded-xl border border-black/[0.07] bg-zinc-50 p-3.5 hover:border-black/15 hover:bg-zinc-100 transition-all">
-                    <div className="h-8 w-8 rounded-full bg-zinc-100 flex items-center justify-center text-xs font-semibold text-zinc-900 shrink-0">
+                    className="flex items-center gap-3 rounded-xl border border-black/[0.07] bg-[var(--bg-surface)] p-3.5 hover:border-black/15 hover:bg-[var(--bg-surface)] transition-all">
+                    <div className="h-8 w-8 rounded-full bg-[var(--bg-surface)] flex items-center justify-center text-xs font-semibold text-[var(--text-primary)] shrink-0">
                       {chat.customerName?.[0]?.toUpperCase()}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-zinc-900 truncate">{chat.customerName}</p>
-                      <p className="text-xs text-zinc-400 truncate">{chat.lastMessage || chat.jobTitle}</p>
+                      <p className="text-sm font-medium text-[var(--text-primary)] truncate">{chat.customerName}</p>
+                      <p className="text-xs text-[var(--text-muted)] truncate">{chat.lastMessage || chat.jobTitle}</p>
                     </div>
                     {chat.lastMessageAt && (
-                      <span className="text-[10px] text-zinc-400 shrink-0">{formatRelativeTime(chat.lastMessageAt)}</span>
+                      <span className="text-[10px] text-[var(--text-muted)] shrink-0">{formatRelativeTime(chat.lastMessageAt)}</span>
                     )}
                   </Link>
                 ))}

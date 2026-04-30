@@ -60,15 +60,15 @@ export default function BrowseJobsPage() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
             <div className="flex items-start justify-between mb-6">
               <div>
-                <h1 className="text-2xl font-bold text-zinc-900 mb-1">Browse Jobs</h1>
-                <p className="text-sm text-zinc-400">{filtered.length} available job{filtered.length !== 1 ? 's' : ''}</p>
+                <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-1">Browse Jobs</h1>
+                <p className="text-sm text-[var(--text-muted)]">{filtered.length} available job{filtered.length !== 1 ? 's' : ''}</p>
               </div>
             </div>
 
             {/* Search + filters */}
             <div className="flex flex-col sm:flex-row gap-3">
               <div className="relative flex-1">
-                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
+                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
                 <input
                   type="text"
                   placeholder="Search jobs, location…"
@@ -78,7 +78,7 @@ export default function BrowseJobsPage() {
                 />
               </div>
               <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
-                <Filter size={13} className="text-zinc-400 shrink-0" />
+                <Filter size={13} className="text-[var(--text-muted)] shrink-0" />
                 {(['all', ...Object.keys(CATEGORIES)] as (JobCategory | 'all')[]).slice(0, 6).map(cat => (
                   <button
                     key={cat}
@@ -86,8 +86,8 @@ export default function BrowseJobsPage() {
                     className={cn(
                       'shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium transition-all duration-150',
                       category === cat
-                        ? 'bg-white text-black'
-                        : 'bg-white/[0.04] text-zinc-500 hover:text-zinc-900 hover:bg-white/[0.08] border border-white/[0.08]'
+                        ? 'bg-[var(--bg-base)] text-[var(--text-primary)]'
+                        : 'bg-white/[0.04] text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-base)]/[0.08] border border-white/[0.08]'
                     )}
                   >
                     {cat === 'all' ? 'All' : cat.toString().replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
@@ -103,10 +103,10 @@ export default function BrowseJobsPage() {
           {filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-24 text-center">
               <div className="h-14 w-14 rounded-2xl border border-white/[0.08] bg-white/[0.02] flex items-center justify-center mb-4">
-                <Briefcase size={20} className="text-zinc-400" />
+                <Briefcase size={20} className="text-[var(--text-muted)]" />
               </div>
-              <p className="text-base font-medium text-zinc-500 mb-1">No jobs found</p>
-              <p className="text-sm text-zinc-400">Try a different category or check back soon</p>
+              <p className="text-base font-medium text-[var(--text-muted)] mb-1">No jobs found</p>
+              <p className="text-sm text-[var(--text-muted)]">Try a different category or check back soon</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">

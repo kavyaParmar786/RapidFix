@@ -64,7 +64,7 @@ export default function FeedPage() {
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-2xl font-bold text-zinc-900" style={{ fontFamily: 'var(--font-sans)' }}>
+              <h1 className="text-2xl font-bold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-sans)' }}>
                 Job Feed
               </h1>
               <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
@@ -76,7 +76,7 @@ export default function FeedPage() {
                 'flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium',
                 profile?.isAvailable
                   ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                  : 'bg-zinc-100 text-zinc-500 border border-black/15'
+                  : 'bg-[var(--bg-surface)] text-[var(--text-muted)] border border-black/15'
               )}>
                 <span className={cn('h-1.5 w-1.5 rounded-full', profile?.isAvailable ? 'bg-green-400 animate-pulse' : 'bg-white/30')} />
                 {profile?.isAvailable ? 'Online' : 'Offline'}
@@ -86,14 +86,14 @@ export default function FeedPage() {
 
           {/* Category filter */}
           <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-2">
-            <Filter size={14} className="text-zinc-400 flex-shrink-0" />
+            <Filter size={14} className="text-[var(--text-muted)] flex-shrink-0" />
             <button
               onClick={() => setFilter('all')}
               className={cn(
                 'flex-shrink-0 rounded-full px-4 py-1.5 text-sm font-medium transition-all',
                 filter === 'all'
-                  ? 'bg-zinc-900/30 border border-zinc-300/50 text-zinc-600'
-                  : 'border border-black/10 bg-zinc-50 text-zinc-500 hover:text-zinc-900'
+                  ? 'bg-zinc-900/30 border border-[var(--border-strong)]/50 text-[var(--text-secondary)]'
+                  : 'border border-black/10 bg-[var(--bg-surface)] text-[var(--text-muted)] hover:text-[var(--text-primary)]'
               )}
             >
               All
@@ -105,8 +105,8 @@ export default function FeedPage() {
                 className={cn(
                   'flex-shrink-0 flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium transition-all',
                   filter === cat.value
-                    ? 'bg-zinc-900/30 border border-zinc-300/50 text-zinc-600'
-                    : 'border border-black/10 bg-zinc-50 text-zinc-500 hover:text-zinc-900'
+                    ? 'bg-zinc-900/30 border border-[var(--border-strong)]/50 text-[var(--text-secondary)]'
+                    : 'border border-black/10 bg-[var(--bg-surface)] text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                 )}
               >
                 {cat.icon} {cat.label}
@@ -129,7 +129,7 @@ export default function FeedPage() {
           {jobs.length === 0 ? (
             <div className="glass-card p-12 text-center">
               <div className="text-4xl mb-3">🔍</div>
-              <p className="font-medium text-zinc-900 mb-1">No jobs available</p>
+              <p className="font-medium text-[var(--text-primary)] mb-1">No jobs available</p>
               <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                 New jobs matching your filter will appear here in real time
               </p>

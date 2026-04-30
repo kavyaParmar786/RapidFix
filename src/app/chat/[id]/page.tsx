@@ -126,14 +126,14 @@ export default function ChatPage() {
           style={{ background: 'rgba(15,20,32,0.95)', backdropFilter: 'blur(20px)' }}>
           <Link
             href={profile?.role === 'customer' ? '/dashboard/customer' : '/dashboard/worker'}
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-black/10 bg-zinc-50 text-zinc-600 hover:text-zinc-900 transition-colors"
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-black/10 bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
           >
             <ArrowLeft size={14} />
           </Link>
 
           <div className="flex items-center gap-2.5 flex-1 min-w-0">
             <div className="relative">
-              <div className="h-9 w-9 overflow-hidden rounded-full bg-zinc-900/30 flex items-center justify-center text-sm font-bold text-zinc-600 flex-shrink-0">
+              <div className="h-9 w-9 overflow-hidden rounded-full bg-zinc-900/30 flex items-center justify-center text-sm font-bold text-[var(--text-secondary)] flex-shrink-0">
                 {otherPhoto ? (
                   <Image src={otherPhoto} alt="" width={36} height={36} className="object-cover rounded-full" />
                 ) : (
@@ -143,7 +143,7 @@ export default function ChatPage() {
               <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-[#0f1420] bg-green-400" />
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-semibold text-zinc-900 truncate">{otherName}</p>
+              <p className="text-sm font-semibold text-[var(--text-primary)] truncate">{otherName}</p>
               <p className="text-[11px] truncate" style={{ color: 'var(--text-secondary)' }}>
                 Re: {chat.jobTitle}
               </p>
@@ -152,7 +152,7 @@ export default function ChatPage() {
 
           <Link
             href={`/jobs/${chat.jobId}`}
-            className="hidden sm:flex items-center gap-1.5 rounded-lg border border-black/10 bg-zinc-50 px-3 py-1.5 text-xs text-zinc-500 hover:text-zinc-900 transition-colors"
+            className="hidden sm:flex items-center gap-1.5 rounded-lg border border-black/10 bg-[var(--bg-surface)] px-3 py-1.5 text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
           >
             View Job
           </Link>
@@ -165,7 +165,7 @@ export default function ChatPage() {
               <div className="h-16 w-16 rounded-2xl bg-zinc-900/20 flex items-center justify-center text-3xl">
                 💬
               </div>
-              <p className="font-medium text-zinc-900">Start the conversation</p>
+              <p className="font-medium text-[var(--text-primary)]">Start the conversation</p>
               <p className="text-sm text-center max-w-xs" style={{ color: 'var(--text-secondary)' }}>
                 Send a message to coordinate with {otherName} about the job.
               </p>
@@ -176,9 +176,9 @@ export default function ChatPage() {
             <div key={date}>
               {/* Date divider */}
               <div className="flex items-center gap-3 my-4">
-                <div className="flex-1 h-px bg-zinc-100" />
-                <span className="text-xs text-zinc-400 bg-zinc-50 rounded-full px-3 py-1">{date}</span>
-                <div className="flex-1 h-px bg-zinc-100" />
+                <div className="flex-1 h-px bg-[var(--bg-surface)]" />
+                <span className="text-xs text-[var(--text-muted)] bg-[var(--bg-surface)] rounded-full px-3 py-1">{date}</span>
+                <div className="flex-1 h-px bg-[var(--bg-surface)]" />
               </div>
 
               <div className="space-y-3">
@@ -188,7 +188,7 @@ export default function ChatPage() {
                     <div key={msg.id} className={cn('flex gap-2', isMe && 'flex-row-reverse')}>
                       {/* Avatar */}
                       {!isMe && (
-                        <div className="h-7 w-7 rounded-full bg-zinc-900/30 flex items-center justify-center text-xs font-bold text-zinc-600 flex-shrink-0 self-end">
+                        <div className="h-7 w-7 rounded-full bg-zinc-900/30 flex items-center justify-center text-xs font-bold text-[var(--text-secondary)] flex-shrink-0 self-end">
                           {msg.senderPhoto ? (
                             <Image src={msg.senderPhoto} alt="" width={28} height={28} className="rounded-full object-cover" />
                           ) : (
@@ -202,8 +202,8 @@ export default function ChatPage() {
                           className={cn(
                             'rounded-2xl px-4 py-2.5 text-sm shadow-sm',
                             isMe
-                              ? 'rounded-br-sm bg-gradient-to-br from-zinc-700 to-violet-600 text-zinc-900'
-                              : 'rounded-bl-sm bg-zinc-100 text-zinc-900 border border-black/10'
+                              ? 'rounded-br-sm bg-gradient-to-br from-zinc-700 to-violet-600 text-[var(--text-primary)]'
+                              : 'rounded-bl-sm bg-[var(--bg-surface)] text-[var(--text-primary)] border border-black/10'
                           )}
                         >
                           {msg.imageUrl && (
@@ -215,7 +215,7 @@ export default function ChatPage() {
                         </div>
                         <span className="mt-1 text-[10px] px-1" style={{ color: 'var(--text-muted)' }}>
                           {new Date(msg.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
-                          {isMe && <CheckCheck size={11} className="inline ml-1 text-zinc-600" />}
+                          {isMe && <CheckCheck size={11} className="inline ml-1 text-[var(--text-secondary)]" />}
                         </span>
                       </div>
                     </div>
@@ -235,9 +235,9 @@ export default function ChatPage() {
             <div className="relative h-14 w-14 overflow-hidden rounded-xl">
               <Image src={imagePreview} alt="" fill className="object-cover" />
             </div>
-            <p className="text-xs text-zinc-500 flex-1">{imageFile?.name}</p>
+            <p className="text-xs text-[var(--text-muted)] flex-1">{imageFile?.name}</p>
             <button onClick={() => { setImageFile(null); setImagePreview(null) }}
-              className="h-6 w-6 flex items-center justify-center rounded-full bg-zinc-100 text-zinc-500 hover:bg-red-500/30 hover:text-red-400">
+              className="h-6 w-6 flex items-center justify-center rounded-full bg-[var(--bg-surface)] text-[var(--text-muted)] hover:bg-red-500/30 hover:text-red-400">
               <X size={12} />
             </button>
           </div>
@@ -249,7 +249,7 @@ export default function ChatPage() {
           <input ref={fileRef} type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
           <button
             onClick={() => fileRef.current?.click()}
-            className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-black/10 bg-zinc-50 text-zinc-500 transition-all hover:bg-zinc-100 hover:text-zinc-900"
+            className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-black/10 bg-[var(--bg-surface)] text-[var(--text-muted)] transition-all hover:bg-[var(--bg-surface)] hover:text-[var(--text-primary)]"
           >
             <ImageIcon size={16} />
           </button>
@@ -270,8 +270,8 @@ export default function ChatPage() {
             className={cn(
               'flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl transition-all',
               sending || (!text.trim() && !imageFile)
-                ? 'bg-zinc-100 text-zinc-400 cursor-not-allowed'
-                : 'bg-gradient-to-br from-zinc-700 to-violet-600 text-zinc-900 hover:shadow-lg hover:shadow-indigo-500/30'
+                ? 'bg-[var(--bg-surface)] text-[var(--text-muted)] cursor-not-allowed'
+                : 'bg-gradient-to-br from-zinc-700 to-violet-600 text-[var(--text-primary)] hover:shadow-lg hover:shadow-indigo-500/30'
             )}
           >
             <Send size={16} />

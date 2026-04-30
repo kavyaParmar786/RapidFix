@@ -43,15 +43,15 @@ export default function HowItWorksPage() {
       <div className="min-h-screen pt-[52px]" style={{ background: 'var(--bg-base)' }}>
 
         {/* Hero */}
-        <div className="border-b border-black/[0.06] bg-zinc-50">
+        <div className="border-b border-black/[0.06] bg-[var(--bg-surface)]">
           <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-20 text-center">
-            <div className="inline-flex items-center gap-2 rounded-full border border-black/[0.08] bg-white px-3 py-1 text-xs font-medium text-zinc-500 mb-6 shadow-sm">
-              <Zap size={11} className="text-zinc-400" /> Simple. Fast. Reliable.
+            <div className="inline-flex items-center gap-2 rounded-full border border-black/[0.08] bg-[var(--bg-base)] px-3 py-1 text-xs font-medium text-[var(--text-muted)] mb-6 shadow-sm">
+              <Zap size={11} className="text-[var(--text-muted)]" /> Simple. Fast. Reliable.
             </div>
-            <h1 className="text-4xl sm:text-5xl font-bold text-zinc-900 tracking-tight mb-5">
+            <h1 className="text-4xl sm:text-5xl font-bold text-[var(--text-primary)] tracking-tight mb-5">
               How RapidFix works
             </h1>
-            <p className="text-lg text-zinc-500 max-w-xl mx-auto mb-8 leading-relaxed">
+            <p className="text-lg text-[var(--text-muted)] max-w-xl mx-auto mb-8 leading-relaxed">
               From posting a job to getting it done — here's exactly how RapidFix connects you with the right professional.
             </p>
             <div className="flex items-center justify-center gap-3 flex-wrap">
@@ -68,25 +68,25 @@ export default function HowItWorksPage() {
         {/* For Customers */}
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center mb-14">
-            <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-2">For Customers</p>
-            <h2 className="text-3xl font-bold text-zinc-900">Book a professional in 4 steps</h2>
+            <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-widest mb-2">For Customers</p>
+            <h2 className="text-3xl font-bold text-[var(--text-primary)]">Book a professional in 4 steps</h2>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {CUSTOMER_STEPS.map(({ num, icon: Icon, title, desc }) => (
               <div key={num} className="relative">
-                <div className="rounded-2xl border border-black/[0.07] bg-white p-6 shadow-sm hover:shadow-md transition-shadow h-full">
+                <div className="rounded-2xl border border-black/[0.07] bg-[var(--bg-base)] p-6 shadow-sm hover:shadow-md transition-shadow h-full">
                   <div className="flex items-center justify-between mb-5">
-                    <div className="h-10 w-10 rounded-xl bg-zinc-100 flex items-center justify-center">
-                      <Icon size={18} className="text-zinc-600" />
+                    <div className="h-10 w-10 rounded-xl bg-[var(--bg-surface)] flex items-center justify-center">
+                      <Icon size={18} className="text-[var(--text-secondary)]" />
                     </div>
                     <span className="text-2xl font-black text-zinc-100">{num}</span>
                   </div>
-                  <h3 className="text-base font-semibold text-zinc-900 mb-2">{title}</h3>
-                  <p className="text-sm text-zinc-400 leading-relaxed">{desc}</p>
+                  <h3 className="text-base font-semibold text-[var(--text-primary)] mb-2">{title}</h3>
+                  <p className="text-sm text-[var(--text-muted)] leading-relaxed">{desc}</p>
                 </div>
                 {num !== '04' && (
                   <div className="hidden lg:block absolute top-10 -right-3 z-10">
-                    <ArrowRight size={14} className="text-zinc-300" />
+                    <ArrowRight size={14} className="text-[var(--text-muted)]" />
                   </div>
                 )}
               </div>
@@ -95,20 +95,20 @@ export default function HowItWorksPage() {
         </div>
 
         {/* Why RapidFix */}
-        <div className="border-y border-black/[0.06] bg-zinc-50">
+        <div className="border-y border-black/[0.06] bg-[var(--bg-surface)]">
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-20">
             <div className="text-center mb-14">
-              <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-2">Why choose us</p>
-              <h2 className="text-3xl font-bold text-zinc-900">Built for speed and trust</h2>
+              <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-widest mb-2">Why choose us</p>
+              <h2 className="text-3xl font-bold text-[var(--text-primary)]">Built for speed and trust</h2>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {WHY.map(({ icon: Icon, title, desc }) => (
-                <div key={title} className="rounded-2xl border border-black/[0.07] bg-white p-6 shadow-sm">
-                  <div className="h-10 w-10 rounded-xl bg-zinc-100 flex items-center justify-center mb-4">
-                    <Icon size={18} className="text-zinc-600" />
+                <div key={title} className="rounded-2xl border border-black/[0.07] bg-[var(--bg-base)] p-6 shadow-sm">
+                  <div className="h-10 w-10 rounded-xl bg-[var(--bg-surface)] flex items-center justify-center mb-4">
+                    <Icon size={18} className="text-[var(--text-secondary)]" />
                   </div>
-                  <h3 className="text-sm font-semibold text-zinc-900 mb-1.5">{title}</h3>
-                  <p className="text-xs text-zinc-400 leading-relaxed">{desc}</p>
+                  <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1.5">{title}</h3>
+                  <p className="text-xs text-[var(--text-muted)] leading-relaxed">{desc}</p>
                 </div>
               ))}
             </div>
@@ -118,20 +118,20 @@ export default function HowItWorksPage() {
         {/* For Workers */}
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-20">
           <div className="text-center mb-14">
-            <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-2">For Workers</p>
-            <h2 className="text-3xl font-bold text-zinc-900">Start earning in 4 steps</h2>
+            <p className="text-xs font-semibold text-[var(--text-muted)] uppercase tracking-widest mb-2">For Workers</p>
+            <h2 className="text-3xl font-bold text-[var(--text-primary)]">Start earning in 4 steps</h2>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {WORKER_STEPS.map(({ num, icon: Icon, title, desc }) => (
-              <div key={num} className="rounded-2xl border border-black/[0.07] bg-white p-6 shadow-sm hover:shadow-md transition-shadow">
+              <div key={num} className="rounded-2xl border border-black/[0.07] bg-[var(--bg-base)] p-6 shadow-sm hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between mb-5">
-                  <div className="h-10 w-10 rounded-xl bg-zinc-100 flex items-center justify-center">
-                    <Icon size={18} className="text-zinc-600" />
+                  <div className="h-10 w-10 rounded-xl bg-[var(--bg-surface)] flex items-center justify-center">
+                    <Icon size={18} className="text-[var(--text-secondary)]" />
                   </div>
                   <span className="text-2xl font-black text-zinc-100">{num}</span>
                 </div>
-                <h3 className="text-base font-semibold text-zinc-900 mb-2">{title}</h3>
-                <p className="text-sm text-zinc-400 leading-relaxed">{desc}</p>
+                <h3 className="text-base font-semibold text-[var(--text-primary)] mb-2">{title}</h3>
+                <p className="text-sm text-[var(--text-muted)] leading-relaxed">{desc}</p>
               </div>
             ))}
           </div>
@@ -143,9 +143,9 @@ export default function HowItWorksPage() {
         </div>
 
         {/* FAQ */}
-        <div className="border-t border-black/[0.06] bg-zinc-50">
+        <div className="border-t border-black/[0.06] bg-[var(--bg-surface)]">
           <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-20">
-            <h2 className="text-3xl font-bold text-zinc-900 text-center mb-12">Frequently asked questions</h2>
+            <h2 className="text-3xl font-bold text-[var(--text-primary)] text-center mb-12">Frequently asked questions</h2>
             <div className="space-y-4">
               {[
                 { q: 'How quickly can I get a worker?', a: 'Most jobs are accepted within 30 minutes during peak hours. For urgent jobs, we notify multiple workers simultaneously.' },
@@ -154,9 +154,9 @@ export default function HowItWorksPage() {
                 { q: 'Is there a booking fee?', a: 'Posting a job is completely free. You only pay the worker after the job is done to your satisfaction.' },
                 { q: 'How do workers get paid?', a: 'Workers receive payment directly after the job is marked complete by the customer. Payments are processed securely.' },
               ].map(({ q, a }) => (
-                <div key={q} className="rounded-2xl border border-black/[0.07] bg-white p-6 shadow-sm">
-                  <h3 className="text-sm font-semibold text-zinc-900 mb-2">{q}</h3>
-                  <p className="text-sm text-zinc-400 leading-relaxed">{a}</p>
+                <div key={q} className="rounded-2xl border border-black/[0.07] bg-[var(--bg-base)] p-6 shadow-sm">
+                  <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-2">{q}</h3>
+                  <p className="text-sm text-[var(--text-muted)] leading-relaxed">{a}</p>
                 </div>
               ))}
             </div>

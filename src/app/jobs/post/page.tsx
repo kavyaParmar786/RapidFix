@@ -100,13 +100,13 @@ export default function PostJobPage() {
         <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 py-10">
 
           {/* Back */}
-          <Link href="/dashboard/customer" className="inline-flex items-center gap-2 text-sm mb-6 transition-colors hover:text-zinc-900"
+          <Link href="/dashboard/customer" className="inline-flex items-center gap-2 text-sm mb-6 transition-colors hover:text-[var(--text-primary)]"
             style={{ color: 'var(--text-secondary)' }}>
             <ArrowLeft size={14} /> Back to Dashboard
           </Link>
 
           <div className="glass-card p-8">
-            <h1 className="text-2xl font-bold text-zinc-900 mb-2" style={{ fontFamily: 'var(--font-sans)' }}>
+            <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-2" style={{ fontFamily: 'var(--font-sans)' }}>
               Post a Service Request
             </h1>
             <p className="text-sm mb-8" style={{ color: 'var(--text-secondary)' }}>
@@ -116,7 +116,7 @@ export default function PostJobPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Title */}
               <div>
-                <label className="block text-sm font-medium text-zinc-600 mb-2">
+                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
                   Job Title <span className="text-red-400">*</span>
                 </label>
                 <input
@@ -128,12 +128,12 @@ export default function PostJobPage() {
                   maxLength={100}
                   required
                 />
-                <p className="mt-1 text-right text-xs text-zinc-400">{title.length}/100</p>
+                <p className="mt-1 text-right text-xs text-[var(--text-muted)]">{title.length}/100</p>
               </div>
 
               {/* Category */}
               <div>
-                <label className="block text-sm font-medium text-zinc-600 mb-2">Category</label>
+                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Category</label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   {CATEGORIES.map((cat) => (
                     <button
@@ -143,8 +143,8 @@ export default function PostJobPage() {
                       className={cn(
                         'flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm transition-all',
                         category === cat.value
-                          ? 'border-zinc-300/60 bg-zinc-900/15 text-zinc-600'
-                          : 'border-black/10 bg-zinc-50 text-zinc-500 hover:border-black/20 hover:text-zinc-900'
+                          ? 'border-[var(--border-strong)]/60 bg-zinc-900/15 text-[var(--text-secondary)]'
+                          : 'border-black/10 bg-[var(--bg-surface)] text-[var(--text-muted)] hover:border-black/20 hover:text-[var(--text-primary)]'
                       )}
                     >
                       <span>{cat.icon}</span>
@@ -156,7 +156,7 @@ export default function PostJobPage() {
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-zinc-600 mb-2">
+                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
                   Description <span className="text-red-400">*</span>
                 </label>
                 <textarea
@@ -171,7 +171,7 @@ export default function PostJobPage() {
 
               {/* Urgency */}
               <div>
-                <label className="block text-sm font-medium text-zinc-600 mb-2">Urgency Level</label>
+                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Urgency Level</label>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {urgencyLevels.map((u) => (
                     <button
@@ -180,7 +180,7 @@ export default function PostJobPage() {
                       onClick={() => setUrgency(u.value)}
                       className={cn(
                         'rounded-xl border p-3 text-center transition-all',
-                        urgency === u.value ? u.color : 'border-black/10 bg-zinc-50 text-zinc-500 hover:border-black/20'
+                        urgency === u.value ? u.color : 'border-black/10 bg-[var(--bg-surface)] text-[var(--text-muted)] hover:border-black/20'
                       )}
                     >
                       <p className="text-sm font-semibold">{u.label}</p>
@@ -193,7 +193,7 @@ export default function PostJobPage() {
               {/* Budget + Location */}
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-zinc-600 mb-2">Budget (₹) — Optional</label>
+                  <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">Budget (₹) — Optional</label>
                   <input
                     type="number"
                     value={budget}
@@ -204,11 +204,11 @@ export default function PostJobPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-zinc-600 mb-2">
+                  <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
                     Location <span className="text-red-400">*</span>
                   </label>
                   <div className="relative">
-                    <MapPin size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" />
+                    <MapPin size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)]" />
                     <input
                       type="text"
                       value={location}
@@ -223,23 +223,23 @@ export default function PostJobPage() {
 
               {/* Image upload */}
               <div>
-                <label className="block text-sm font-medium text-zinc-600 mb-2">
+                <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">
                   Photos (up to 5)
                 </label>
                 <div
                   {...getRootProps()}
                   className={cn(
                     'rounded-xl border-2 border-dashed p-8 text-center transition-all cursor-pointer',
-                    isDragActive ? 'border-zinc-300 bg-zinc-900/10' : 'border-black/15 hover:border-white/25',
+                    isDragActive ? 'border-[var(--border-strong)] bg-zinc-900/10' : 'border-black/15 hover:border-white/25',
                     images.length >= 5 && 'opacity-50 cursor-not-allowed'
                   )}
                 >
                   <input {...getInputProps()} />
-                  <Upload size={24} className="mx-auto mb-3 text-zinc-400" />
-                  <p className="text-sm text-zinc-500">
+                  <Upload size={24} className="mx-auto mb-3 text-[var(--text-muted)]" />
+                  <p className="text-sm text-[var(--text-muted)]">
                     {isDragActive ? 'Drop here…' : 'Drag & drop or click to upload'}
                   </p>
-                  <p className="text-xs text-zinc-400 mt-1">PNG, JPG up to 10MB ({images.length}/5)</p>
+                  <p className="text-xs text-[var(--text-muted)] mt-1">PNG, JPG up to 10MB ({images.length}/5)</p>
                 </div>
 
                 {previews.length > 0 && (
@@ -250,7 +250,7 @@ export default function PostJobPage() {
                         <button
                           type="button"
                           onClick={() => removeImage(i)}
-                          className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/70 text-zinc-900 hover:bg-red-600"
+                          className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-black/70 text-[var(--text-primary)] hover:bg-red-600"
                         >
                           <X size={10} />
                         </button>

@@ -53,7 +53,21 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Theme transition overlay */
+#theme-transition-overlay {
+  will-change: opacity;
+}
+
+/* Smooth color transitions on theme switch for all elements */
+html:not(.theme-switching) * {
+  transition: background-color 0.22s ease, border-color 0.22s ease, color 0.2s ease !important;
+}
+/* During transition, let the overlay handle it — disable element transitions for instant swap */
+html.theme-switching * {
+  transition: none !important;
 }
 
 ::selection { background: rgba(0,0,0,0.12); }

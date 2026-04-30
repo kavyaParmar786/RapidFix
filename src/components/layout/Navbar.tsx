@@ -60,7 +60,7 @@ function ShareButton() {
   return (
     <div ref={ref} className="relative">
       <motion.button onClick={() => setOpen(!open)} whileTap={{ scale: 0.9 }}
-        className="flex h-8 w-8 items-center justify-center rounded-full text-white/60 hover:bg-white/10 hover:text-white transition-colors">
+        className="flex h-8 w-8 items-center justify-center rounded-full text-white/60 hover:bg-[var(--bg-base)]/10 hover:text-white transition-colors">
         <Share2 size={14} />
       </motion.button>
       <AnimatePresence>
@@ -102,7 +102,7 @@ function SettingsPanel({ onClose }: { onClose: () => void }) {
     <motion.button onClick={() => onChange(!value)}
       className={cn('relative w-9 h-5 rounded-full transition-colors duration-200', value ? 'bg-[var(--accent)]' : 'bg-[var(--bg-overlay)]')}>
       <motion.div animate={{ x: value ? 16 : 2 }} transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-        className="absolute top-0.5 h-4 w-4 rounded-full bg-white shadow" />
+        className="absolute top-0.5 h-4 w-4 rounded-full bg-[var(--bg-base)] shadow" />
     </motion.button>
   )
 
@@ -187,8 +187,29 @@ export default function Navbar() {
   const handleLogout = async () => { await logout(); window.location.href = '/' }
   const isWorker = profile?.role === 'worker'
 
+  const anyDropdownOpen = servicesOpen || userMenuOpen || notifOpen || settingsOpen
+
   return (
     <>
+      {/* ── Backdrop blur overlay when any dropdown is open ── */}
+      <AnimatePresence>
+        {anyDropdownOpen && (
+          <motion.div
+            key="nav-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.22 }}
+            className="fixed inset-0 z-40 pointer-events-none"
+            style={{
+              backdropFilter: 'blur(6px) saturate(120%)',
+              WebkitBackdropFilter: 'blur(6px) saturate(120%)',
+              background: 'rgba(0,0,0,0.18)',
+            }}
+          />
+        )}
+      </AnimatePresence>
+
       {/* ── Desktop: Dynamic Island floating pill ── */}
       <div className="fixed top-4 left-0 right-0 z-50 hidden md:flex justify-center px-4 pointer-events-none">
         <motion.nav
@@ -207,7 +228,7 @@ export default function Navbar() {
           className="pointer-events-auto flex items-center gap-0.5 rounded-full px-2.5 py-2 transition-all duration-500"
         >
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 shrink-0 mr-1 px-2.5 py-1 rounded-full hover:bg-white/10 transition-colors">
+          <Link href="/" className="flex items-center gap-2 shrink-0 mr-1 px-2.5 py-1 rounded-full hover:bg-[var(--bg-base)]/10 transition-colors">
             <div className="relative h-5 w-5">
               <Image src="/logo.png" alt="RapidFix" fill className="object-contain" />
             </div>
@@ -220,7 +241,7 @@ export default function Navbar() {
           <div ref={servicesRef} className="relative">
             <motion.button onClick={() => setServicesOpen(!servicesOpen)} whileTap={{ scale: 0.97 }}
               className={cn('flex items-center gap-1 rounded-full px-3 py-1.5 text-[13px] font-medium transition-colors',
-                servicesOpen ? 'bg-white/15 text-white' : 'text-white/65 hover:text-white hover:bg-white/10')}>
+                servicesOpen ? 'bg-white/15 text-white' : 'text-white/65 hover:text-white hover:bg-[var(--bg-base)]/10')}>
               Services
               <motion.span animate={{ rotate: servicesOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
                 <ChevronDown size={11} />
@@ -261,20 +282,20 @@ export default function Navbar() {
 
           <Link href="/how-it-works"
             className={cn('rounded-full px-3 py-1.5 text-[13px] font-medium transition-colors',
-              pathname === '/how-it-works' ? 'bg-white/15 text-white' : 'text-white/65 hover:text-white hover:bg-white/10')}>
+              pathname === '/how-it-works' ? 'bg-white/15 text-white' : 'text-white/65 hover:text-white hover:bg-[var(--bg-base)]/10')}>
             How it Works
           </Link>
 
           {isWorker && (
             <Link href="/jobs/browse"
               className={cn('rounded-full px-3 py-1.5 text-[13px] font-medium transition-colors',
-                pathname === '/jobs/browse' ? 'bg-white/15 text-white' : 'text-white/65 hover:text-white hover:bg-white/10')}>
+                pathname === '/jobs/browse' ? 'bg-white/15 text-white' : 'text-white/65 hover:text-white hover:bg-[var(--bg-base)]/10')}>
               Browse Jobs
             </Link>
           )}
 
           <Link href="/auth/signup?role=worker"
-            className="rounded-full px-3 py-1.5 text-[13px] font-medium text-white/65 hover:text-white hover:bg-white/10 transition-colors">
+            className="rounded-full px-3 py-1.5 text-[13px] font-medium text-white/65 hover:text-white hover:bg-[var(--bg-base)]/10 transition-colors">
             Become a Worker
           </Link>
 
@@ -287,12 +308,12 @@ export default function Navbar() {
 
               <div ref={notifRef} className="relative">
                 <motion.button onClick={() => setNotifOpen(!notifOpen)} whileTap={{ scale: 0.9 }}
-                  className="relative flex h-8 w-8 items-center justify-center rounded-full text-white/60 hover:bg-white/10 hover:text-white transition-colors">
+                  className="relative flex h-8 w-8 items-center justify-center rounded-full text-white/60 hover:bg-[var(--bg-base)]/10 hover:text-white transition-colors">
                   <Bell size={14} />
                   <AnimatePresence>
                     {unreadCount > 0 && (
                       <motion.span initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}
-                        className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-white" />
+                        className="absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-[var(--bg-base)]" />
                     )}
                   </AnimatePresence>
                 </motion.button>
@@ -321,7 +342,7 @@ export default function Navbar() {
               <div ref={settingsRef} className="relative">
                 <motion.button onClick={() => setSettingsOpen(!settingsOpen)} whileTap={{ scale: 0.9 }}
                   className={cn('flex h-8 w-8 items-center justify-center rounded-full transition-colors',
-                    settingsOpen ? 'bg-white/15 text-white' : 'text-white/60 hover:bg-white/10 hover:text-white')}>
+                    settingsOpen ? 'bg-white/15 text-white' : 'text-white/60 hover:bg-[var(--bg-base)]/10 hover:text-white')}>
                   <motion.span animate={{ rotate: settingsOpen ? 90 : 0 }} transition={{ duration: 0.25, type: 'spring' }}>
                     <Settings size={14} />
                   </motion.span>
@@ -334,14 +355,14 @@ export default function Navbar() {
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
                 <Link href={`/dashboard/${profile.role}`}
                   className={cn('flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] font-medium transition-colors',
-                    pathname.startsWith('/dashboard') ? 'bg-white/20 text-white' : 'text-white/65 hover:text-white hover:bg-white/10')}>
+                    pathname.startsWith('/dashboard') ? 'bg-white/20 text-white' : 'text-white/65 hover:text-white hover:bg-[var(--bg-base)]/10')}>
                   <LayoutDashboard size={12} /> Dashboard
                 </Link>
               </motion.div>
 
               <div ref={userMenuRef} className="relative ml-0.5">
                 <motion.button onClick={() => setUserMenuOpen(!userMenuOpen)} whileTap={{ scale: 0.97 }}
-                  className="flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 pl-1 pr-2.5 py-1 transition-all hover:bg-white/15 hover:border-white/25">
+                  className="flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 pl-1 pr-2.5 py-1 transition-all hover:bg-[var(--bg-base)]/15 hover:border-white/25">
                   <div className="h-6 w-6 rounded-full overflow-hidden bg-white/20 flex items-center justify-center shrink-0">
                     {profile.photoURL
                       ? <Image src={profile.photoURL} alt="" width={24} height={24} className="object-cover" />
@@ -382,12 +403,12 @@ export default function Navbar() {
             <>
               <ShareButton />
               <Link href="/auth/login"
-                className="text-[13px] font-medium text-white/65 hover:text-white transition-colors px-3 py-1.5 rounded-full hover:bg-white/10">
+                className="text-[13px] font-medium text-white/65 hover:text-white transition-colors px-3 py-1.5 rounded-full hover:bg-[var(--bg-base)]/10">
                 Sign in
               </Link>
               <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
                 <Link href="/auth/signup"
-                  className="rounded-full bg-white text-[#09090b] px-4 py-1.5 text-[13px] font-semibold transition-all hover:bg-white/90">
+                  className="rounded-full bg-[var(--bg-base)] text-[#09090b] px-4 py-1.5 text-[13px] font-semibold transition-all hover:bg-[var(--bg-base)]/90">
                   Get started →
                 </Link>
               </motion.div>
@@ -398,6 +419,25 @@ export default function Navbar() {
 
       {/* Spacer so page content clears the floating pill */}
       <div className="hidden md:block h-20" />
+
+      {/* ── Mobile backdrop blur ── */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            key="mobile-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.22 }}
+            className="fixed inset-0 z-40 pointer-events-none md:hidden"
+            style={{
+              backdropFilter: 'blur(8px) saturate(120%)',
+              WebkitBackdropFilter: 'blur(8px) saturate(120%)',
+              background: 'rgba(0,0,0,0.2)',
+            }}
+          />
+        )}
+      </AnimatePresence>
 
       {/* ── Mobile: classic top bar ── */}
       <nav className="md:hidden fixed top-0 left-0 right-0 z-50 border-b border-[var(--border-subtle)] bg-[var(--bg-base)]/95 backdrop-blur-xl">

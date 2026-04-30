@@ -63,7 +63,7 @@ export default function CustomerDashboard() {
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h1 className="text-2xl font-bold text-zinc-900" style={{ fontFamily: 'var(--font-sans)' }}>
+              <h1 className="text-2xl font-bold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-sans)' }}>
                 Welcome, {profile?.displayName?.split(' ')[0]} 👋
               </h1>
               <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
@@ -78,7 +78,7 @@ export default function CustomerDashboard() {
           {/* Stats */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             {[
-              { icon: Briefcase, label: 'Total Jobs', value: stats.total, color: 'text-zinc-500', bg: 'from-zinc-700/20 to-indigo-600/10' },
+              { icon: Briefcase, label: 'Total Jobs', value: stats.total, color: 'text-[var(--text-muted)]', bg: 'from-zinc-700/20 to-indigo-600/10' },
               { icon: TrendingUp, label: 'Active', value: stats.active, color: 'text-yellow-400', bg: 'from-yellow-500/20 to-yellow-600/10' },
               { icon: CheckCircle, label: 'Completed', value: stats.completed, color: 'text-green-400', bg: 'from-green-500/20 to-green-600/10' },
               { icon: MessageCircle, label: 'Chats', value: stats.unreadChats, color: 'text-cyan-400', bg: 'from-cyan-500/20 to-cyan-600/10' },
@@ -99,15 +99,15 @@ export default function CustomerDashboard() {
             {/* Jobs */}
             <div className="lg:col-span-2">
               {/* Tabs */}
-              <div className="flex gap-1 rounded-xl border border-black/10 bg-zinc-50 p-1 mb-5 overflow-x-auto">
+              <div className="flex gap-1 rounded-xl border border-black/10 bg-[var(--bg-surface)] p-1 mb-5 overflow-x-auto">
                 {tabs.map((t) => (
                   <button
                     key={t.key}
                     onClick={() => setActiveTab(t.key)}
                     className={`flex-shrink-0 rounded-lg px-4 py-2 text-sm font-medium transition-all ${
                       activeTab === t.key
-                        ? 'bg-gradient-to-r from-zinc-700 to-violet-600 text-zinc-900 shadow'
-                        : 'text-zinc-500 hover:text-zinc-900'
+                        ? 'bg-gradient-to-r from-zinc-700 to-violet-600 text-[var(--text-primary)] shadow'
+                        : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                     }`}
                   >
                     {t.label}
@@ -124,7 +124,7 @@ export default function CustomerDashboard() {
                 {filteredJobs.length === 0 ? (
                   <div className="glass-card p-12 text-center">
                     <div className="text-4xl mb-3">📋</div>
-                    <p className="font-medium text-zinc-900 mb-1">No jobs yet</p>
+                    <p className="font-medium text-[var(--text-primary)] mb-1">No jobs yet</p>
                     <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
                       Post your first service request to get started
                     </p>
@@ -140,27 +140,27 @@ export default function CustomerDashboard() {
 
             {/* Sidebar: Recent Chats */}
             <div>
-              <h2 className="font-semibold text-zinc-900 mb-4" style={{ fontFamily: 'var(--font-sans)' }}>
+              <h2 className="font-semibold text-[var(--text-primary)] mb-4" style={{ fontFamily: 'var(--font-sans)' }}>
                 Recent Chats
               </h2>
               <div className="space-y-3">
                 {chats.length === 0 ? (
                   <div className="glass-card p-6 text-center">
-                    <MessageCircle size={24} className="mx-auto mb-2 text-zinc-400" />
-                    <p className="text-sm text-zinc-500">No active chats</p>
+                    <MessageCircle size={24} className="mx-auto mb-2 text-[var(--text-muted)]" />
+                    <p className="text-sm text-[var(--text-muted)]">No active chats</p>
                   </div>
                 ) : (
                   chats.map((chat) => (
                     <Link
                       key={chat.id}
                       href={`/chat/${chat.id}`}
-                      className="glass-card flex items-center gap-3 p-4 transition-all hover:border-black/20 hover:bg-zinc-50"
+                      className="glass-card flex items-center gap-3 p-4 transition-all hover:border-black/20 hover:bg-[var(--bg-surface)]"
                     >
-                      <div className="h-9 w-9 rounded-full bg-zinc-900/30 flex items-center justify-center text-sm font-bold text-zinc-600 flex-shrink-0">
+                      <div className="h-9 w-9 rounded-full bg-zinc-900/30 flex items-center justify-center text-sm font-bold text-[var(--text-secondary)] flex-shrink-0">
                         {chat.workerName?.[0]}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-zinc-900 truncate">{chat.workerName}</p>
+                        <p className="text-sm font-medium text-[var(--text-primary)] truncate">{chat.workerName}</p>
                         <p className="text-xs truncate" style={{ color: 'var(--text-secondary)' }}>
                           {chat.lastMessage || chat.jobTitle}
                         </p>

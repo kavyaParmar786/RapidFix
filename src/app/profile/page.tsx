@@ -98,7 +98,7 @@ export default function ProfilePage() {
       <Navbar />
       <div className="min-h-screen pt-16" style={{ background: 'var(--bg-base)' }}>
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-10">
-          <h1 className="text-2xl font-bold text-zinc-900 mb-8" style={{ fontFamily: 'var(--font-sans)' }}>
+          <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-8" style={{ fontFamily: 'var(--font-sans)' }}>
             My Profile
           </h1>
 
@@ -107,14 +107,14 @@ export default function ProfilePage() {
             <div className="flex items-start gap-5 flex-wrap">
               {/* Avatar */}
               <div className="relative flex-shrink-0">
-                <div className="h-20 w-20 overflow-hidden rounded-2xl bg-zinc-900/30 flex items-center justify-center text-3xl font-bold text-zinc-600">
+                <div className="h-20 w-20 overflow-hidden rounded-2xl bg-zinc-900/30 flex items-center justify-center text-3xl font-bold text-[var(--text-secondary)]">
                   {profile.photoURL ? (
                     <Image src={profile.photoURL} alt="" width={80} height={80} className="object-cover" />
                   ) : (
                     profile.displayName?.[0]?.toUpperCase()
                   )}
                 </div>
-                <label className="absolute -bottom-1.5 -right-1.5 flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-zinc-900 border-2 border-[var(--bg-base)] text-zinc-900 hover:bg-zinc-700 transition-colors">
+                <label className="absolute -bottom-1.5 -right-1.5 flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-zinc-900 border-2 border-[var(--bg-base)] text-[var(--text-primary)] hover:bg-zinc-700 transition-colors">
                   {uploading ? (
                     <div className="h-3 w-3 rounded-full border-2 border-white/30 border-t-white animate-spin" />
                   ) : (
@@ -133,16 +133,16 @@ export default function ProfilePage() {
                     className="input-base text-lg font-bold mb-2"
                   />
                 ) : (
-                  <h2 className="text-xl font-bold text-zinc-900 mb-1" style={{ fontFamily: 'var(--font-sans)' }}>
+                  <h2 className="text-xl font-bold text-[var(--text-primary)] mb-1" style={{ fontFamily: 'var(--font-sans)' }}>
                     {profile.displayName}
                   </h2>
                 )}
-                <p className="text-sm text-zinc-500 capitalize mb-2">{profile.role}</p>
+                <p className="text-sm text-[var(--text-muted)] capitalize mb-2">{profile.role}</p>
 
                 {profile.role === 'worker' && (
                   <div className="flex items-center gap-2">
                     <StarRating value={profile.rating || 0} readonly size={14} />
-                    <span className="text-sm text-zinc-500">
+                    <span className="text-sm text-[var(--text-muted)]">
                       {profile.rating?.toFixed(1) || '0.0'} ({profile.reviewCount || 0} reviews)
                     </span>
                   </div>
@@ -151,7 +151,7 @@ export default function ProfilePage() {
 
               <button
                 onClick={() => editing ? setEditing(false) : setEditing(true)}
-                className="flex items-center gap-1.5 rounded-xl border border-black/15 bg-zinc-50 px-4 py-2 text-sm font-medium text-zinc-600 transition-all hover:bg-zinc-100 hover:text-zinc-900"
+                className="flex items-center gap-1.5 rounded-xl border border-black/15 bg-[var(--bg-surface)] px-4 py-2 text-sm font-medium text-[var(--text-secondary)] transition-all hover:bg-[var(--bg-surface)] hover:text-[var(--text-primary)]"
               >
                 {editing ? <><X size={14} /> Cancel</> : <><Edit3 size={14} /> Edit</>}
               </button>
@@ -160,17 +160,17 @@ export default function ProfilePage() {
 
           {/* Details form */}
           <div className="glass-card p-6 mb-6 space-y-5">
-            <h3 className="font-semibold text-zinc-900" style={{ fontFamily: 'var(--font-sans)' }}>
+            <h3 className="font-semibold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-sans)' }}>
               Personal Info
             </h3>
 
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-medium text-zinc-500 mb-1.5">Email</label>
+                <label className="block text-xs font-medium text-[var(--text-muted)] mb-1.5">Email</label>
                 <div className="input-base opacity-60 text-sm">{profile.email}</div>
               </div>
               <div>
-                <label className="block text-xs font-medium text-zinc-500 mb-1.5">Phone</label>
+                <label className="block text-xs font-medium text-[var(--text-muted)] mb-1.5">Phone</label>
                 {editing ? (
                   <input
                     type="tel"
@@ -184,7 +184,7 @@ export default function ProfilePage() {
                 )}
               </div>
               <div className="sm:col-span-2">
-                <label className="block text-xs font-medium text-zinc-500 mb-1.5">Location</label>
+                <label className="block text-xs font-medium text-[var(--text-muted)] mb-1.5">Location</label>
                 {editing ? (
                   <input
                     type="text"
@@ -198,7 +198,7 @@ export default function ProfilePage() {
                 )}
               </div>
               <div className="sm:col-span-2">
-                <label className="block text-xs font-medium text-zinc-500 mb-1.5">Bio</label>
+                <label className="block text-xs font-medium text-[var(--text-muted)] mb-1.5">Bio</label>
                 {editing ? (
                   <textarea
                     value={form.bio}
@@ -217,7 +217,7 @@ export default function ProfilePage() {
             {profile.role === 'worker' && (
               <>
                 <div>
-                  <label className="block text-xs font-medium text-zinc-500 mb-1.5">Experience</label>
+                  <label className="block text-xs font-medium text-[var(--text-muted)] mb-1.5">Experience</label>
                   {editing ? (
                     <input
                       type="text"
@@ -232,7 +232,7 @@ export default function ProfilePage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-zinc-500 mb-2">Skills / Categories</label>
+                  <label className="block text-xs font-medium text-[var(--text-muted)] mb-2">Skills / Categories</label>
                   {editing ? (
                     <div className="flex flex-wrap gap-2">
                       {CATEGORIES.map((cat) => (
@@ -243,8 +243,8 @@ export default function ProfilePage() {
                           className={cn(
                             'flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs transition-all',
                             form.skills.includes(cat.value)
-                              ? 'border-zinc-300/60 bg-zinc-900/20 text-zinc-600'
-                              : 'border-black/10 bg-zinc-50 text-zinc-500 hover:border-black/20'
+                              ? 'border-[var(--border-strong)]/60 bg-zinc-900/20 text-[var(--text-secondary)]'
+                              : 'border-black/10 bg-[var(--bg-surface)] text-[var(--text-muted)] hover:border-black/20'
                           )}
                         >
                           {cat.icon} {cat.label}
@@ -254,12 +254,12 @@ export default function ProfilePage() {
                   ) : (
                     <div className="flex flex-wrap gap-2">
                       {(profile.skills || []).length === 0 ? (
-                        <span className="text-sm text-zinc-400">No skills set</span>
+                        <span className="text-sm text-[var(--text-muted)]">No skills set</span>
                       ) : (
                         profile.skills!.map((s) => {
                           const cat = CATEGORIES.find((c) => c.value === s)
                           return cat ? (
-                            <span key={s} className="flex items-center gap-1.5 rounded-full border border-zinc-300/30 bg-zinc-900/10 px-3 py-1 text-xs text-zinc-600">
+                            <span key={s} className="flex items-center gap-1.5 rounded-full border border-[var(--border-strong)]/30 bg-zinc-900/10 px-3 py-1 text-xs text-[var(--text-secondary)]">
                               {cat.icon} {cat.label}
                             </span>
                           ) : null
@@ -286,11 +286,11 @@ export default function ProfilePage() {
           {/* Reviews (worker only) */}
           {profile.role === 'worker' && (
             <div className="glass-card p-6">
-              <h3 className="font-semibold text-zinc-900 mb-4" style={{ fontFamily: 'var(--font-sans)' }}>
+              <h3 className="font-semibold text-[var(--text-primary)] mb-4" style={{ fontFamily: 'var(--font-sans)' }}>
                 Reviews ({reviews.length})
               </h3>
               {reviews.length === 0 ? (
-                <p className="text-sm text-zinc-400">No reviews yet. Complete jobs to earn reviews.</p>
+                <p className="text-sm text-[var(--text-muted)]">No reviews yet. Complete jobs to earn reviews.</p>
               ) : (
                 <div className="space-y-4">
                   {reviews.map((r) => (
@@ -299,7 +299,7 @@ export default function ProfilePage() {
                         <div className="h-7 w-7 rounded-full bg-violet-500/30 flex items-center justify-center text-xs font-bold text-violet-300">
                           {r.reviewerName?.[0]}
                         </div>
-                        <span className="text-sm font-medium text-zinc-900">{r.reviewerName}</span>
+                        <span className="text-sm font-medium text-[var(--text-primary)]">{r.reviewerName}</span>
                         <StarRating value={r.rating} readonly size={12} />
                       </div>
                       <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{r.comment}</p>

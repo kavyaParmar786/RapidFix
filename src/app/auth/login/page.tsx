@@ -165,7 +165,10 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold mb-2" style={{ color: 'var(--text-secondary)' }}>Password</label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-xs font-semibold" style={{ color: 'var(--text-secondary)' }}>Password</label>
+                <Link href="/auth/forgot-password" className="text-xs transition-colors" style={{ color: 'var(--text-muted)' }}>Forgot password?</Link>
+              </div>
               <div className="relative">
                 <Lock size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors"
                   style={{ color: focusedField === 'pw' ? 'var(--text-primary)' : 'var(--text-muted)' }} />

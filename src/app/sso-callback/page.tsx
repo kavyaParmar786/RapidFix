@@ -23,7 +23,7 @@ export default function SSOCallback() {
     <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg-base)' }}>
       <div className="text-center">
         <div className="h-10 w-10 rounded-full border-2 border-black/10 border-t-indigo-500 animate-spin mx-auto mb-4" />
-        <p className="text-sm text-zinc-500">Completing sign in…</p>
+        <p className="text-sm text-[var(--text-muted)]">Completing sign in…</p>
       </div>
     </div>
   )

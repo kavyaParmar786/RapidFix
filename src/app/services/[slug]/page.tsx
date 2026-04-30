@@ -60,7 +60,7 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
   const service = SERVICE_DATA[params.slug]
   if (!service) return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg-base)' }}>
-      <p className="text-zinc-400">Service not found</p>
+      <p className="text-[var(--text-muted)]">Service not found</p>
     </div>
   )
 
@@ -71,15 +71,15 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
         {/* Hero */}
         <div className="border-b border-white/[0.06]">
           <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-16 text-center">
-            <p className="text-xs font-medium text-zinc-400 uppercase tracking-widest mb-4">RapidFix Service</p>
-            <h1 className="text-4xl sm:text-5xl font-bold text-zinc-900 mb-4">{service.title}</h1>
-            <p className="text-lg text-zinc-500 mb-8">{service.tagline}</p>
-            <p className="text-sm text-zinc-400 max-w-xl mx-auto mb-10">{service.description}</p>
+            <p className="text-xs font-medium text-[var(--text-muted)] uppercase tracking-widest mb-4">RapidFix Service</p>
+            <h1 className="text-4xl sm:text-5xl font-bold text-[var(--text-primary)] mb-4">{service.title}</h1>
+            <p className="text-lg text-[var(--text-muted)] mb-8">{service.tagline}</p>
+            <p className="text-sm text-[var(--text-muted)] max-w-xl mx-auto mb-10">{service.description}</p>
             <div className="flex items-center justify-center gap-4 flex-wrap">
               <Link href="/auth/signup" className="btn-primary px-6 py-2.5 text-sm">
                 Book Now <ArrowRight size={14} className="ml-1.5" />
               </Link>
-              <span className="text-sm text-zinc-400">Starting at <span className="text-zinc-900 font-medium">{service.price}</span></span>
+              <span className="text-sm text-[var(--text-muted)]">Starting at <span className="text-[var(--text-primary)] font-medium">{service.price}</span></span>
             </div>
           </div>
         </div>
@@ -88,18 +88,18 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-16">
           <div className="grid md:grid-cols-2 gap-12">
             <div>
-              <h2 className="text-xl font-bold text-zinc-900 mb-6">What's included</h2>
+              <h2 className="text-xl font-bold text-[var(--text-primary)] mb-6">What's included</h2>
               <div className="space-y-3">
                 {service.tasks.map(task => (
                   <div key={task} className="flex items-center gap-3">
-                    <CheckCircle size={14} className="text-zinc-400 shrink-0" />
-                    <span className="text-sm text-zinc-600">{task}</span>
+                    <CheckCircle size={14} className="text-[var(--text-muted)] shrink-0" />
+                    <span className="text-sm text-[var(--text-secondary)]">{task}</span>
                   </div>
                 ))}
               </div>
             </div>
             <div className="space-y-4">
-              <h2 className="text-xl font-bold text-zinc-900 mb-6">Why RapidFix</h2>
+              <h2 className="text-xl font-bold text-[var(--text-primary)] mb-6">Why RapidFix</h2>
               {[
                 { icon: Clock, title: 'Same-day availability', desc: 'Book and get a worker within hours' },
                 { icon: Shield, title: 'Verified professionals', desc: 'Every worker is ID-checked and rated' },
@@ -107,11 +107,11 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
               ].map(({ icon: Icon, title, desc }) => (
                 <div key={title} className="flex items-start gap-4 rounded-xl border border-white/[0.07] bg-white/[0.02] p-4">
                   <div className="h-8 w-8 rounded-lg border border-white/[0.08] bg-white/[0.04] flex items-center justify-center shrink-0">
-                    <Icon size={14} className="text-zinc-500" />
+                    <Icon size={14} className="text-[var(--text-muted)]" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-zinc-900">{title}</p>
-                    <p className="text-xs text-zinc-400 mt-0.5">{desc}</p>
+                    <p className="text-sm font-medium text-[var(--text-primary)]">{title}</p>
+                    <p className="text-xs text-[var(--text-muted)] mt-0.5">{desc}</p>
                   </div>
                 </div>
               ))}
@@ -119,8 +119,8 @@ export default function ServicePage({ params }: { params: { slug: string } }) {
           </div>
 
           <div className="mt-16 text-center rounded-2xl border border-white/[0.08] bg-white/[0.02] p-10">
-            <h3 className="text-2xl font-bold text-zinc-900 mb-2">Ready to book?</h3>
-            <p className="text-sm text-zinc-400 mb-6">Create a free account and post your job in under 2 minutes.</p>
+            <h3 className="text-2xl font-bold text-[var(--text-primary)] mb-2">Ready to book?</h3>
+            <p className="text-sm text-[var(--text-muted)] mb-6">Create a free account and post your job in under 2 minutes.</p>
             <Link href="/auth/signup" className="btn-primary px-8 py-3">
               Get started — it's free
             </Link>

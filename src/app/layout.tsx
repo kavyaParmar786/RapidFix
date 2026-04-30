@@ -4,6 +4,7 @@ import '@/styles/globals.css'
 import { AuthProvider } from '@/lib/auth-context'
 import { ThemeProvider } from '@/lib/theme-context'
 import { Toaster } from 'react-hot-toast'
+import CookieBanner from '@/components/ui/CookieBanner'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -16,6 +17,9 @@ export const metadata: Metadata = {
   description: 'Connect with skilled local professionals for all your home service needs.',
   keywords: ['home services', 'repair', 'electrician', 'plumber', 'handyman', 'on-demand'],
   icons: { icon: '/logo.png', apple: '/logo.png' },
+  manifest: '/manifest.json',
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=5',
+  themeColor: [{ media: '(prefers-color-scheme: dark)', color: '#09090b' }, { media: '(prefers-color-scheme: light)', color: '#ffffff' }],
   openGraph: {
     title: 'RapidFix — Home Services On Demand',
     description: 'Connect with skilled local professionals instantly',
@@ -53,6 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider>
           <AuthProvider>
             {children}
+            <CookieBanner />
             <Toaster
               position="top-right"
               toastOptions={{

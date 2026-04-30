@@ -98,7 +98,7 @@ export default function AdminPage() {
 
   if (loading || !profile) return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg-base)' }}>
-      <div className="h-5 w-5 rounded-full border-2 border-zinc-200 border-t-zinc-700 animate-spin" />
+      <div className="h-5 w-5 rounded-full border-2 border-[var(--border-default)] border-t-zinc-700 animate-spin" />
     </div>
   )
 
@@ -108,11 +108,11 @@ export default function AdminPage() {
     <>
       <Navbar />
       <div className="min-h-screen pt-[52px]" style={{ background: 'var(--bg-base)' }}>
-        <div className="border-b border-black/[0.06] bg-zinc-50">
+        <div className="border-b border-black/[0.06] bg-[var(--bg-surface)]">
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-6 flex items-center justify-between">
             <div>
-              <h1 className="text-xl font-bold text-zinc-900">Admin Panel</h1>
-              <p className="text-sm text-zinc-400">Configure RapidFix settings and pricing</p>
+              <h1 className="text-xl font-bold text-[var(--text-primary)]">Admin Panel</h1>
+              <p className="text-sm text-[var(--text-muted)]">Configure RapidFix settings and pricing</p>
             </div>
             <button onClick={saveConfig} disabled={saving}
               className={cn('btn-primary px-5 py-2.5 text-sm flex items-center gap-2 rounded-lg', saved && 'bg-green-600 hover:bg-green-700')}>
@@ -124,7 +124,7 @@ export default function AdminPage() {
 
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-8">
           {/* Tabs */}
-          <div className="flex gap-1 rounded-xl border border-black/[0.08] bg-zinc-50 p-1 mb-8 w-fit">
+          <div className="flex gap-1 rounded-xl border border-black/[0.08] bg-[var(--bg-surface)] p-1 mb-8 w-fit">
             {[
               { key: 'pricing', icon: DollarSign, label: 'Pricing' },
               { key: 'general', icon: Settings, label: 'General' },
@@ -132,7 +132,7 @@ export default function AdminPage() {
             ].map(({ key, icon: Icon, label }) => (
               <button key={key} onClick={() => setTab(key as any)}
                 className={cn('flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all',
-                  tab === key ? 'bg-white shadow-sm text-zinc-900 border border-black/[0.08]' : 'text-zinc-500 hover:text-zinc-700'
+                  tab === key ? 'bg-[var(--bg-base)] shadow-sm text-[var(--text-primary)] border border-black/[0.08]' : 'text-[var(--text-muted)] hover:text-[var(--text-secondary)]'
                 )}>
                 <Icon size={13} />{label}
               </button>
@@ -143,24 +143,24 @@ export default function AdminPage() {
           {tab === 'pricing' && (
             <div>
               <div className="mb-6">
-                <h2 className="text-base font-semibold text-zinc-900 mb-1">Service Pricing</h2>
-                <p className="text-sm text-zinc-400">Set the base price shown on each service page and used as job budget defaults.</p>
+                <h2 className="text-base font-semibold text-[var(--text-primary)] mb-1">Service Pricing</h2>
+                <p className="text-sm text-[var(--text-muted)]">Set the base price shown on each service page and used as job budget defaults.</p>
               </div>
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {Object.entries(config.prices).map(([key, val]) => (
-                  <div key={key} className="rounded-2xl border border-black/[0.07] bg-white p-5 shadow-sm">
-                    <p className="text-sm font-semibold text-zinc-900 mb-4">{val.name}</p>
+                  <div key={key} className="rounded-2xl border border-black/[0.07] bg-[var(--bg-base)] p-5 shadow-sm">
+                    <p className="text-sm font-semibold text-[var(--text-primary)] mb-4">{val.name}</p>
                     <div className="space-y-3">
                       <div>
-                        <label className="block text-xs font-medium text-zinc-400 mb-1.5">Base price (₹)</label>
+                        <label className="block text-xs font-medium text-[var(--text-muted)] mb-1.5">Base price (₹)</label>
                         <div className="relative">
-                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm">₹</span>
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)] text-sm">₹</span>
                           <input type="number" value={val.base} onChange={e => updatePrice(key, 'base', e.target.value)}
                             className="input-base pl-7" min="0" />
                         </div>
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-zinc-400 mb-1.5">Unit label</label>
+                        <label className="block text-xs font-medium text-[var(--text-muted)] mb-1.5">Unit label</label>
                         <input type="text" value={val.unit} onChange={e => updatePrice(key, 'unit', e.target.value)}
                           className="input-base" placeholder="per visit" />
                       </div>
@@ -169,9 +169,9 @@ export default function AdminPage() {
                 ))}
               </div>
 
-              <div className="mt-6 rounded-2xl border border-black/[0.07] bg-white p-5 shadow-sm">
-                <label className="block text-sm font-semibold text-zinc-900 mb-1">Platform commission (%)</label>
-                <p className="text-xs text-zinc-400 mb-3">Percentage taken from each job payment.</p>
+              <div className="mt-6 rounded-2xl border border-black/[0.07] bg-[var(--bg-base)] p-5 shadow-sm">
+                <label className="block text-sm font-semibold text-[var(--text-primary)] mb-1">Platform commission (%)</label>
+                <p className="text-xs text-[var(--text-muted)] mb-3">Percentage taken from each job payment.</p>
                 <input type="number" value={config.commissionPercent}
                   onChange={e => setConfig(p => ({ ...p, commissionPercent: Number(e.target.value) }))}
                   className="input-base max-w-[120px]" min="0" max="50" />
@@ -182,29 +182,29 @@ export default function AdminPage() {
           {/* General tab */}
           {tab === 'general' && (
             <div className="space-y-5 max-w-xl">
-              <h2 className="text-base font-semibold text-zinc-900 mb-4">Site Settings</h2>
+              <h2 className="text-base font-semibold text-[var(--text-primary)] mb-4">Site Settings</h2>
               {[
                 { label: 'Site name', key: 'siteName', type: 'text', placeholder: 'RapidFix' },
                 { label: 'Contact phone', key: 'contactPhone', type: 'tel', placeholder: '+91 94094 05573' },
                 { label: 'Contact email', key: 'contactEmail', type: 'email', placeholder: 'support@rapidfix.app' },
               ].map(({ label, key, type, placeholder }) => (
-                <div key={key} className="rounded-2xl border border-black/[0.07] bg-white p-5 shadow-sm">
-                  <label className="block text-sm font-medium text-zinc-700 mb-2">{label}</label>
+                <div key={key} className="rounded-2xl border border-black/[0.07] bg-[var(--bg-base)] p-5 shadow-sm">
+                  <label className="block text-sm font-medium text-[var(--text-secondary)] mb-2">{label}</label>
                   <input type={type} value={(config as any)[key]} placeholder={placeholder}
                     onChange={e => setConfig(p => ({ ...p, [key]: e.target.value }))}
                     className="input-base" />
                 </div>
               ))}
 
-              <div className="rounded-2xl border border-black/[0.07] bg-white p-5 shadow-sm">
+              <div className="rounded-2xl border border-black/[0.07] bg-[var(--bg-base)] p-5 shadow-sm">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-zinc-900">Maintenance mode</p>
-                    <p className="text-xs text-zinc-400 mt-0.5">Show a maintenance message to all visitors</p>
+                    <p className="text-sm font-medium text-[var(--text-primary)]">Maintenance mode</p>
+                    <p className="text-xs text-[var(--text-muted)] mt-0.5">Show a maintenance message to all visitors</p>
                   </div>
                   <button onClick={() => setConfig(p => ({ ...p, maintenanceMode: !p.maintenanceMode }))}
-                    className={cn('relative h-6 w-11 rounded-full transition-colors', config.maintenanceMode ? 'bg-zinc-900' : 'bg-zinc-200')}>
-                    <span className={cn('absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform', config.maintenanceMode ? 'left-5' : 'left-0.5')} />
+                    className={cn('relative h-6 w-11 rounded-full transition-colors', config.maintenanceMode ? 'bg-zinc-900' : 'bg-[var(--bg-elevated)]')}>
+                    <span className={cn('absolute top-0.5 h-5 w-5 rounded-full bg-[var(--bg-base)] shadow transition-transform', config.maintenanceMode ? 'left-5' : 'left-0.5')} />
                   </button>
                 </div>
                 {config.maintenanceMode && (
@@ -220,7 +220,7 @@ export default function AdminPage() {
           {tab === 'stats' && (
             <div>
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-base font-semibold text-zinc-900">Platform Stats</h2>
+                <h2 className="text-base font-semibold text-[var(--text-primary)]">Platform Stats</h2>
                 <button onClick={loadStats} disabled={loadingStats} className="btn-ghost text-xs px-3 py-1.5 flex items-center gap-1.5">
                   <RefreshCw size={12} className={loadingStats ? 'animate-spin' : ''} /> Refresh
                 </button>
@@ -232,12 +232,12 @@ export default function AdminPage() {
                   { label: 'Workers', value: stats.workers, icon: Settings },
                   { label: 'Customers', value: stats.customers, icon: Users },
                 ].map(({ label, value, icon: Icon }) => (
-                  <div key={label} className="rounded-2xl border border-black/[0.07] bg-white p-6 shadow-sm">
+                  <div key={label} className="rounded-2xl border border-black/[0.07] bg-[var(--bg-base)] p-6 shadow-sm">
                     <div className="flex items-center justify-between mb-3">
-                      <Icon size={16} className="text-zinc-400" />
-                      <span className="text-3xl font-bold text-zinc-900">{loadingStats ? '…' : value}</span>
+                      <Icon size={16} className="text-[var(--text-muted)]" />
+                      <span className="text-3xl font-bold text-[var(--text-primary)]">{loadingStats ? '…' : value}</span>
                     </div>
-                    <p className="text-xs text-zinc-400">{label}</p>
+                    <p className="text-xs text-[var(--text-muted)]">{label}</p>
                   </div>
                 ))}
               </div>
