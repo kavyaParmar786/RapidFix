@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, CheckCircle, CreditCard, Shield, Zap, Lock, Smartphone } from 'lucide-react'
@@ -37,7 +37,7 @@ function SuccessConfetti() {
   )
 }
 
-export default function PaymentPage() {
+function PaymentContent() {
   const searchParams = useSearchParams()
   const { user, profile } = useAuth()
   const [step, setStep] = useState<PayStep>('summary')
@@ -288,5 +288,17 @@ export default function PaymentPage() {
         </div>
       </div>
     </>
+  )
+}
+
+export default function PaymentPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg-base)' }}>
+        <div className="h-5 w-5 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: 'var(--border-strong)', borderTopColor: 'transparent' }} />
+      </div>
+    }>
+      <PaymentContent />
+    </Suspense>
   )
 }
