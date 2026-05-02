@@ -4,17 +4,13 @@ import { db } from '@/lib/firebase'
 
 /**
  * GET /api/cron/payment-reminder
- * Runs every 30 minutes via Vercel Cron.
- * Finds jobs that are "accepted" (worker matched) but not yet paid after 30 min,
- * and sends a payment reminder email to the customer.
+ * Runs once per day at 10am via Vercel Cron (Hobby plan limit: once/day).
+ * Finds jobs that are "accepted" but unpaid after 30+ minutes and sends a reminder.
  *
- * Add to vercel.json:
- * {
- *   "crons": [{ "path": "/api/cron/payment-reminder", "schedule": "*/30 * * * *" }]
- * }
+ * vercel.json schedule: "0 10 * * *"  ← runs at 10:00 AM UTC daily
  *
- * Protect with CRON_SECRET:
- *   vercel.json: "headers": [{ "source": "/api/cron/(.*)", "headers": [{ "key": "Authorization", "value": "Bearer {{CRON_SECRET}}" }] }]
+ * ⚠️  If you upgrade to Vercel Pro, change schedule to "*/30 * * * *" for
+ *     real-time 30-minute reminders.
  */
 export async function GET(req: NextRequest) {
   // Verify cron secret to prevent unauthorized calls
