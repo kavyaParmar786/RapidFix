@@ -30,6 +30,10 @@ export default function JobDetailPage() {
   const [comment, setComment] = useState('')
   const [reviewSent, setReviewSent] = useState(false)
   const [showCancel, setShowCancel] = useState(false)
+  const [showDispute, setShowDispute] = useState(false)
+  const [disputeReason, setDisputeReason] = useState('')
+  const [disputeSubmitting, setDisputeSubmitting] = useState(false)
+  const [disputeDone, setDisputeDone] = useState(false)
 
   useEffect(() => {
     if (!id) return
@@ -208,6 +212,16 @@ export default function JobDetailPage() {
                 disabled={actionLoading}
                 className="flex items-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-5 py-2.5 text-sm font-medium text-red-400 transition-all hover:bg-red-500/20"
               >
+            {/* Report Issue — available on any active/in-progress job for both parties */}
+            {(isCustomer || isWorker) && ['accepted', 'in_progress'].includes(job.status) && (
+              <motion.button
+                whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
+                onClick={() => setShowDispute(true)}
+                className="flex items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 text-sm font-medium text-amber-400 transition-all hover:bg-amber-500/20"
+              >
+                ⚠️ Report Issue
+              </motion.button>
+            )}
                 Cancel Job
               </motion.button>
             )}
@@ -250,6 +264,71 @@ export default function JobDetailPage() {
                 onClose={() => setShowCancel(false)}
                 isWorker={isWorker}
               />
+            )}
+          </AnimatePresence>
+
+          {/* Dispute modal */}
+          <AnimatePresence>
+            {showDispute && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                className="fixed inset-0 z-[999] flex items-center justify-center p-4"
+                style={{ background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(6px)' }}
+                onClick={() => setShowDispute(false)}>
+                <motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.9, y: 10 }}
+                  className="glass-card p-6 w-full max-w-sm"
+                  onClick={e => e.stopPropagation()}>
+                  {disputeDone ? (
+                    <div className="text-center py-4">
+                      <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(34,197,94,0.1)' }}>
+                        <span className="text-2xl">✓</span>
+                      </div>
+                      <h3 className="font-bold text-lg mb-2" style={{ color: 'var(--text-primary)' }}>Dispute raised</h3>
+                      <p className="text-sm mb-5" style={{ color: 'var(--text-muted)' }}>Our team will review and contact you within 24 hours.</p>
+                      <button onClick={() => setShowDispute(false)} className="btn-primary rounded-xl px-8 py-2.5 text-sm">Done</button>
+                    </div>
+                  ) : (
+                    <>
+                      <h3 className="font-bold text-lg mb-1" style={{ color: 'var(--text-primary)' }}>Report an Issue</h3>
+                      <p className="text-xs mb-4" style={{ color: 'var(--text-muted)' }}>Describe the problem. Our team reviews within 24 hours.</p>
+                      <textarea
+                        value={disputeReason}
+                        onChange={e => setDisputeReason(e.target.value)}
+                        rows={4}
+                        placeholder="What went wrong? Please be as specific as possible…"
+                        className="input-base w-full rounded-xl resize-none mb-4 text-sm"
+                      />
+                      <div className="flex gap-3">
+                        <button onClick={() => setShowDispute(false)} className="flex-1 btn-ghost rounded-xl py-2.5 text-sm">Cancel</button>
+                        <motion.button whileTap={{ scale: 0.97 }}
+                          disabled={!disputeReason.trim() || disputeSubmitting}
+                          onClick={async () => {
+                            setDisputeSubmitting(true)
+                            try {
+                              const { addDoc, collection, serverTimestamp } = await import('firebase/firestore')
+                              const { db } = await import('@/lib/firebase')
+                              await addDoc(collection(db, 'disputes'), {
+                                jobId: job.id,
+                                jobTitle: job.title,
+                                reporterId: user?.uid,
+                                reporterName: profile?.displayName,
+                                reason: disputeReason.trim(),
+                                status: 'open',
+                                createdAt: new Date().toISOString(),
+                              })
+                              setDisputeDone(true)
+                            } catch { toast.error('Failed to submit dispute') }
+                            finally { setDisputeSubmitting(false) }
+                          }}
+                          className="flex-1 btn-primary rounded-xl py-2.5 text-sm flex items-center justify-center gap-2">
+                          {disputeSubmitting
+                            ? <><motion.div className="w-3 h-3 rounded-full border-2 border-current/30 border-t-current" animate={{ rotate: 360 }} transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }} /> Submitting…</>
+                            : 'Submit'}
+                        </motion.button>
+                      </div>
+                    </>
+                  )}
+                </motion.div>
+              </motion.div>
             )}
           </AnimatePresence>
       </div>

@@ -1,23 +1,36 @@
 'use client'
 
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { Home, Search, PlusCircle, MessageCircle, User } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '@/lib/auth-context'
+import { subscribeToChats } from '@/lib/firestore'
 import { cn } from '@/lib/utils'
+import { useState, useEffect } from 'react'
 
 const TABS = [
   { href: '/', icon: Home, label: 'Home' },
   { href: '/jobs/browse', icon: Search, label: 'Browse' },
   { href: '/jobs/post', icon: PlusCircle, label: 'Post', primary: true },
-  { href: '/chat', icon: MessageCircle, label: 'Chat' },
+  { href: '/chat', icon: MessageCircle, label: 'Chat', badge: true },
   { href: '/profile', icon: User, label: 'Profile' },
 ]
 
 export default function BottomNav() {
   const pathname = usePathname()
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
+  const [totalUnread, setTotalUnread] = useState(0)
+
+  useEffect(() => {
+    if (!user || !profile) return
+    const role = profile.role as 'customer' | 'worker'
+    const unsub = subscribeToChats(user.uid, role, (chats) => {
+      const sum = chats.reduce((acc, c) => acc + (c.unreadCount?.[user.uid] ?? 0), 0)
+      setTotalUnread(sum)
+    })
+    return () => unsub()
+  }, [user, profile])
 
   // Hide on auth pages and non-app pages
   const hide = ['/auth/', '/sso-callback'].some(p => pathname.startsWith(p))
@@ -35,7 +48,7 @@ export default function BottomNav() {
       }}
     >
       <div className="flex items-center justify-around px-2 py-1">
-        {TABS.map(({ href, icon: Icon, label, primary }) => {
+        {TABS.map(({ href, icon: Icon, label, primary, badge }) => {
           const active = pathname === href || (href !== '/' && pathname.startsWith(href))
           return (
             <Link key={href} href={user || href === '/' ? href : '/auth/login'}
@@ -67,13 +80,26 @@ export default function BottomNav() {
                 <motion.div
                   whileTap={{ scale: 0.88 }}
                   animate={{ y: active ? -1 : 0 }}
-                  className="flex flex-col items-center gap-0.5"
+                  className="relative flex flex-col items-center gap-0.5"
                 >
-                  <Icon
-                    size={20}
-                    style={{ color: active ? 'var(--accent)' : 'var(--text-muted)' }}
-                    strokeWidth={active ? 2.2 : 1.8}
-                  />
+                  <div className="relative">
+                    <Icon
+                      size={20}
+                      style={{ color: active ? 'var(--accent)' : 'var(--text-muted)' }}
+                      strokeWidth={active ? 2.2 : 1.8}
+                    />
+                    {badge && totalUnread > 0 && (
+                      <AnimatePresence>
+                        <motion.span
+                          key={totalUnread}
+                          initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}
+                          className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white"
+                        >
+                          {totalUnread > 9 ? '9+' : totalUnread}
+                        </motion.span>
+                      </AnimatePresence>
+                    )}
+                  </div>
                   <span className="text-[10px] font-medium"
                     style={{ color: active ? 'var(--accent)' : 'var(--text-muted)' }}>
                     {label}

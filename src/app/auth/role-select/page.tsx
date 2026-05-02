@@ -74,6 +74,9 @@ export default function RoleSelectPage() {
         return
       }
 
+      const acceptedTermsAt = sessionStorage.getItem('acceptedTermsAt') || undefined
+      const referredBy = sessionStorage.getItem('referredBy') || undefined
+
       const newProfile: UserProfile = {
         uid: user.uid,
         email: user.email,
@@ -84,12 +87,41 @@ export default function RoleSelectPage() {
         rating: 0,
         reviewCount: 0,
         isVerified: false,
+        ...(acceptedTermsAt && { acceptedTermsAt }),
+        ...(referredBy && { referredBy }),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       }
       await setDoc(doc(db, 'users', user.uid), newProfile)
+
+      // Credit referrer ₹100 if they referred this signup
+      if (referredBy) {
+        const { getDocs, query, where, collection, updateDoc, increment, addDoc } = await import('firebase/firestore')
+        // Reconstruct referrer UID: referral code = RF + first 6 chars of uid (uppercase)
+        const referrersSnap = await getDocs(
+          query(collection(db, 'users'), where('role', 'in', ['customer', 'worker']))
+        )
+        const referrer = referrersSnap.docs.find(d => {
+          const code = `RF${d.id.slice(0, 6).toUpperCase()}`
+          return code === referredBy
+        })
+        if (referrer) {
+          await updateDoc(doc(db, 'users', referrer.id), {
+            referralCredits: (referrer.data().referralCredits ?? 0) + 100,
+          })
+          await addDoc(collection(db, 'referrals'), {
+            referrerId: referrer.id,
+            referredUserId: user.uid,
+            credit: 100,
+            createdAt: new Date().toISOString(),
+          })
+        }
+      }
+
       sessionStorage.removeItem('pendingRole')
       sessionStorage.removeItem('pendingName')
+      sessionStorage.removeItem('acceptedTermsAt')
+      sessionStorage.removeItem('referredBy')
       toast.success('Welcome to RapidFix! 🎉')
       window.location.href = `/dashboard/${role}`
     } catch (err) {

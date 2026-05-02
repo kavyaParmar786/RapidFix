@@ -35,9 +35,35 @@ function BarChart({ data, color }: { data: number[]; color: string }) {
   )
 }
 
-function WithdrawModal({ balance, onClose }: { balance: number; onClose: () => void }) {
+function WithdrawModal({ balance, workerId, onClose }: { balance: number; workerId: string; onClose: () => void }) {
   const [amount, setAmount] = useState(String(balance))
-  const [step, setStep] = useState<'form' | 'confirm' | 'done'>('form')
+  const [accountNumber, setAccountNumber] = useState('')
+  const [ifsc, setIfsc] = useState('')
+  const [accountHolderName, setAccountHolderName] = useState('')
+  const [step, setStep] = useState<'form' | 'bank' | 'confirm' | 'done' | 'error'>('form')
+  const [submitting, setSubmitting] = useState(false)
+  const [errorMsg, setErrorMsg] = useState('')
+
+  const handleConfirm = async () => {
+    setSubmitting(true)
+    try {
+      const res = await fetch('/api/payout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ workerId, amount: Number(amount), accountNumber, ifsc, accountHolderName }),
+      })
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(err?.error || 'Payout failed')
+      }
+      setStep('done')
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Something went wrong')
+      setStep('error')
+    } finally {
+      setSubmitting(false)
+    }
+  }
 
   return (
     <motion.div
@@ -82,25 +108,66 @@ function WithdrawModal({ balance, onClose }: { balance: number; onClose: () => v
               <div className="flex gap-3">
                 <button onClick={onClose} className="flex-1 btn-ghost rounded-xl py-2.5 text-sm">Cancel</button>
                 <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-                  onClick={() => setStep('confirm')} disabled={Number(amount) < 100 || Number(amount) > balance}
+                  onClick={() => setStep('bank')} disabled={Number(amount) < 100 || Number(amount) > balance}
                   className="flex-1 btn-primary rounded-xl py-2.5 text-sm">Continue</motion.button>
               </div>
             </motion.div>
           )}
-          {step === 'confirm' && (
-            <motion.div key="confirm" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
-              <h3 className="font-bold text-lg mb-4" style={{ color: 'var(--text-primary)' }}>Confirm withdrawal</h3>
-              <div className="rounded-2xl p-5 text-center mb-5" style={{ background: 'var(--bg-elevated)' }}>
-                <p className="text-xs mb-1" style={{ color: 'var(--text-muted)' }}>Amount to withdraw</p>
-                <p className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>₹{Number(amount).toLocaleString()}</p>
+
+          {step === 'bank' && (
+            <motion.div key="bank" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+              <h3 className="font-bold text-lg mb-1" style={{ color: 'var(--text-primary)' }}>Bank Details</h3>
+              <p className="text-xs mb-5" style={{ color: 'var(--text-muted)' }}>₹{Number(amount).toLocaleString()} will be sent via IMPS</p>
+              <div className="space-y-3 mb-5">
+                <div>
+                  <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>Account holder name</label>
+                  <input type="text" value={accountHolderName} onChange={e => setAccountHolderName(e.target.value)}
+                    placeholder="As per bank records" className="input-base rounded-xl" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>Account number</label>
+                  <input type="text" value={accountNumber} onChange={e => setAccountNumber(e.target.value)}
+                    placeholder="Your bank account number" className="input-base rounded-xl" inputMode="numeric" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium mb-1.5" style={{ color: 'var(--text-secondary)' }}>IFSC code</label>
+                  <input type="text" value={ifsc} onChange={e => setIfsc(e.target.value.toUpperCase())}
+                    placeholder="e.g. SBIN0001234" className="input-base rounded-xl font-mono tracking-wider" maxLength={11} />
+                </div>
               </div>
               <div className="flex gap-3">
                 <button onClick={() => setStep('form')} className="flex-1 btn-ghost rounded-xl py-2.5 text-sm">Back</button>
                 <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-                  onClick={() => setStep('done')} className="flex-1 btn-primary rounded-xl py-2.5 text-sm">Confirm</motion.button>
+                  onClick={() => setStep('confirm')}
+                  disabled={!accountNumber.trim() || !ifsc.trim() || !accountHolderName.trim()}
+                  className="flex-1 btn-primary rounded-xl py-2.5 text-sm">Review</motion.button>
               </div>
             </motion.div>
           )}
+
+          {step === 'confirm' && (
+            <motion.div key="confirm" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
+              <h3 className="font-bold text-lg mb-4" style={{ color: 'var(--text-primary)' }}>Confirm withdrawal</h3>
+              <div className="rounded-2xl p-5 mb-4 space-y-2 text-xs" style={{ background: 'var(--bg-elevated)' }}>
+                <div className="text-center mb-3">
+                  <p className="text-xs mb-1" style={{ color: 'var(--text-muted)' }}>Amount</p>
+                  <p className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>₹{Number(amount).toLocaleString()}</p>
+                </div>
+                <div className="flex justify-between"><span style={{ color: 'var(--text-muted)' }}>Account holder</span><span style={{ color: 'var(--text-secondary)' }}>{accountHolderName}</span></div>
+                <div className="flex justify-between"><span style={{ color: 'var(--text-muted)' }}>Account</span><span style={{ color: 'var(--text-secondary)' }}>••••{accountNumber.slice(-4)}</span></div>
+                <div className="flex justify-between"><span style={{ color: 'var(--text-muted)' }}>IFSC</span><span style={{ color: 'var(--text-secondary)' }}>{ifsc}</span></div>
+              </div>
+              <div className="flex gap-3">
+                <button onClick={() => setStep('bank')} className="flex-1 btn-ghost rounded-xl py-2.5 text-sm">Back</button>
+                <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
+                  onClick={handleConfirm} disabled={submitting}
+                  className="flex-1 btn-primary rounded-xl py-2.5 text-sm flex items-center justify-center gap-2">
+                  {submitting ? <><motion.div className="w-3 h-3 rounded-full border-2 border-current/30 border-t-current" animate={{ rotate: 360 }} transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }} /> Sending…</> : 'Confirm'}
+                </motion.button>
+              </div>
+            </motion.div>
+          )}
+
           {step === 'done' && (
             <motion.div key="done" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
               transition={{ type: 'spring', stiffness: 200 }} className="text-center py-4">
@@ -112,8 +179,22 @@ function WithdrawModal({ balance, onClose }: { balance: number; onClose: () => v
                 <CheckCircle size={28} className="text-green-500" />
               </motion.div>
               <h3 className="font-bold text-lg mb-1" style={{ color: 'var(--text-primary)' }}>Withdrawal initiated!</h3>
-              <p className="text-sm mb-6" style={{ color: 'var(--text-muted)' }}>₹{Number(amount).toLocaleString()} will reach your bank in 1–2 days.</p>
+              <p className="text-sm mb-6" style={{ color: 'var(--text-muted)' }}>₹{Number(amount).toLocaleString()} will reach your bank in 1–2 business days.</p>
               <button onClick={onClose} className="btn-primary rounded-xl px-8 py-2.5 text-sm">Done</button>
+            </motion.div>
+          )}
+
+          {step === 'error' && (
+            <motion.div key="error" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center py-4">
+              <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(239,68,68,0.1)' }}>
+                <span className="text-2xl">✕</span>
+              </div>
+              <h3 className="font-bold text-lg mb-2" style={{ color: 'var(--text-primary)' }}>Withdrawal failed</h3>
+              <p className="text-sm mb-5" style={{ color: 'var(--text-muted)' }}>{errorMsg}</p>
+              <div className="flex gap-3">
+                <button onClick={() => setStep('bank')} className="flex-1 btn-ghost rounded-xl py-2.5 text-sm">Try again</button>
+                <button onClick={onClose} className="flex-1 btn-primary rounded-xl py-2.5 text-sm">Close</button>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -122,7 +203,7 @@ function WithdrawModal({ balance, onClose }: { balance: number; onClose: () => v
   )
 }
 
-export default function EarningsTab() {
+export default function EarningsTab({ workerId = '' }: { workerId?: string }) {
   const [showWithdraw, setShowWithdraw] = useState(false)
   const totalEarned = 19350
   const availableBalance = 5050
@@ -236,7 +317,7 @@ export default function EarningsTab() {
 
       {/* Withdraw modal */}
       <AnimatePresence>
-        {showWithdraw && <WithdrawModal balance={availableBalance} onClose={() => setShowWithdraw(false)} />}
+        {showWithdraw && <WithdrawModal balance={availableBalance} workerId={workerId} onClose={() => setShowWithdraw(false)} />}
       </AnimatePresence>
     </>
   )

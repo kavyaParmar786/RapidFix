@@ -143,6 +143,8 @@ export default function FeedPage() {
                   showAccept
                   onAccept={handleAccept}
                   accepting={acceptingId === job.id}
+                  workerLat={(profile as any)?.lat}
+                  workerLng={(profile as any)?.lng}
                 />
               ))}
             </div>

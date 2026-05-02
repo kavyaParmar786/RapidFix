@@ -12,7 +12,7 @@ interface AuthContextType {
   loading: boolean
   signInWithGoogle: () => Promise<void>
   signInWithEmail: (email: string, password: string) => Promise<void>
-  signUpWithEmail: (email: string, password: string, name: string, role: UserRole) => Promise<void>
+  signUpWithEmail: (email: string, password: string, name: string, role: UserRole, extras?: { acceptedTermsAt?: string; referredBy?: string }) => Promise<void>
   logout: () => Promise<void>
   updateUserProfile: (data: Partial<UserProfile>) => Promise<void>
   refreshProfile: () => Promise<void>
@@ -58,7 +58,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return
     }
     setProfileLoading(true)
-    fetchProfile(session.user.id).finally(() => setProfileLoading(false))
+    fetchProfile(session.user.id).finally(() => {
+      setProfileLoading(false)
+      // Register FCM token after login so worker gets push when jobs appear
+      import('@/lib/firebase').then(({ requestFCMToken }) => {
+        requestFCMToken(session.user.id).catch(() => {/* silently ignore if blocked */})
+      })
+    })
   }, [isPending, session, fetchProfile])
 
   const signInWithGoogle = async () => {
@@ -70,9 +76,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (res.error) throw new Error(res.error.message || 'Sign-in failed')
   }
 
-  const signUpWithEmail = async (email: string, password: string, name: string, role: UserRole) => {
+  const signUpWithEmail = async (email: string, password: string, name: string, role: UserRole, extras?: { acceptedTermsAt?: string; referredBy?: string }) => {
     sessionStorage.setItem('pendingRole', role)
     sessionStorage.setItem('pendingName', name)
+    if (extras?.acceptedTermsAt) sessionStorage.setItem('acceptedTermsAt', extras.acceptedTermsAt)
+    if (extras?.referredBy) sessionStorage.setItem('referredBy', extras.referredBy)
     const res = await signUp.email({ email, password, name, callbackURL: '/auth/role-select' })
     if (res.error) throw new Error(res.error.message || 'Sign-up failed')
   }

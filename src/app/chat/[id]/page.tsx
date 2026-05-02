@@ -25,8 +25,10 @@ export default function ChatPage() {
   const [sending, setSending] = useState(false)
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [otherIsTyping, setOtherIsTyping] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
   const fileRef = useRef<HTMLInputElement>(null)
+  const typingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // Fetch chat metadata
   useEffect(() => {
@@ -43,10 +45,30 @@ export default function ChatPage() {
     return unsub
   }, [id])
 
-  // Auto-scroll
+  // Subscribe to typing indicators
+  useEffect(() => {
+    if (!id || !user) return
+    const { onSnapshot } = require('firebase/firestore')
+    const typingRef = doc(db, 'chats', id as string, 'typing', 'status')
+    const unsub = onSnapshot(typingRef, (snap: any) => {
+      if (!snap.exists()) return
+      const data = snap.data()
+      // Show "typing" if the OTHER person updated it within last 4s
+      const otherId = Object.keys(data).find(k => k !== user.uid)
+      if (otherId && data[otherId]) {
+        const age = Date.now() - data[otherId]
+        setOtherIsTyping(age < 4000)
+      } else {
+        setOtherIsTyping(false)
+      }
+    })
+    return () => unsub()
+  }, [id, user])
+
+  // Auto-scroll (includes typing indicator)
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [messages])
+  }, [messages, otherIsTyping])
 
   // Validate access
   useEffect(() => {
@@ -56,6 +78,18 @@ export default function ChatPage() {
       }
     }
   }, [chat, user])
+
+  // Write typing timestamp to Firestore
+  const handleTyping = (value: string) => {
+    setText(value)
+    if (!user || !id) return
+    const { setDoc } = require('firebase/firestore')
+    setDoc(doc(db, 'chats', id as string, 'typing', 'status'), { [user.uid]: Date.now() }, { merge: true })
+    if (typingTimerRef.current) clearTimeout(typingTimerRef.current)
+    typingTimerRef.current = setTimeout(() => {
+      setDoc(doc(db, 'chats', id as string, 'typing', 'status'), { [user.uid]: null }, { merge: true })
+    }, 3500)
+  }
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -225,6 +259,30 @@ export default function ChatPage() {
             </div>
           ))}
 
+          {/* Typing indicator */}
+          <AnimatePresence>
+            {otherIsTyping && (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }}
+                className="flex items-end gap-2 px-4 pb-1"
+              >
+                <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+                  style={{ background: 'var(--bg-elevated)', color: 'var(--text-muted)' }}>
+                  {otherName?.[0]}
+                </div>
+                <div className="flex items-center gap-1 rounded-2xl rounded-bl-sm px-4 py-3"
+                  style={{ background: 'var(--bg-elevated)', border: '1px solid var(--border-subtle)' }}>
+                  {[0, 1, 2].map(i => (
+                    <motion.div key={i} className="w-1.5 h-1.5 rounded-full"
+                      style={{ background: 'var(--text-muted)' }}
+                      animate={{ y: [0, -4, 0] }}
+                      transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15, ease: 'easeInOut' }}
+                    />
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
           <div ref={bottomRef} />
         </div>
 
@@ -261,6 +319,8 @@ export default function ChatPage() {
             placeholder="Type a message… (Enter to send)"
             rows={1}
             className="input-base flex-1 resize-none py-2.5 text-sm min-h-[40px] max-h-32"
+                    value={text}
+                    onChange={e => handleTyping(e.target.value)}
             style={{ lineHeight: '1.5' }}
           />
 

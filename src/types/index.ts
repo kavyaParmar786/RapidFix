@@ -44,9 +44,12 @@ export interface Job {
   urgency: UrgencyLevel
   budget?: number
   location: string
+  locationLat?: number
+  locationLng?: number
   images?: string[]
   customerId: string
   customerName: string
+  customerEmail?: string
   customerPhoto?: string
   workerId?: string
   workerName?: string

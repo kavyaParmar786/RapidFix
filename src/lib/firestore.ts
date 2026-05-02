@@ -26,6 +26,21 @@ export async function createJob(data: Omit<Job, 'id' | 'createdAt' | 'updatedAt'
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   })
+
+  // Notify available workers with matching category in the same city (fire-and-forget)
+  if (typeof window !== 'undefined') {
+    fetch('/api/notify-workers', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jobId: ref.id,
+        jobTitle: data.title,
+        category: data.category,
+        location: data.location,
+      }),
+    }).catch(() => {})
+  }
+
   return ref.id
 }
 
@@ -48,7 +63,15 @@ export function subscribeToJobs(
           orderBy('createdAt', 'desc')
         )
   return onSnapshot(q, (snap) => {
-    callback(snap.docs.map((d) => ({ id: d.id, ...d.data() } as Job)))
+    const jobs = snap.docs.map((d) => ({ id: d.id, ...d.data() } as Job))
+    // Pro workers surface first, then by recency
+    jobs.sort((a, b) => {
+      const aPro = (a as any).workerIsPro ? 1 : 0
+      const bPro = (b as any).workerIsPro ? 1 : 0
+      if (bPro !== aPro) return bPro - aPro
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    })
+    callback(jobs)
   })
 }
 
@@ -123,15 +146,33 @@ export async function acceptJob(
       })
     })
 
-    // Notify customer
+    // Notify customer via in-app notification
+    const job = await getJob(jobId)
     await createNotification({
-      userId: (await getJob(jobId))!.customerId,
+      userId: job!.customerId,
       type: 'job_accepted',
       title: 'Job Accepted! 🎉',
       body: `${workerName} accepted your job request`,
       jobId,
       chatId,
     })
+
+    // Send transactional email to customer (fire-and-forget)
+    if (typeof window !== 'undefined' && job?.customerEmail) {
+      fetch('/api/email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'job_accepted',
+          to: job.customerEmail,
+          name: job.customerName,
+          workerName,
+          jobTitle: job.title,
+          chatId,
+          jobId,
+        }),
+      }).catch(() => {})
+    }
 
     return true
   } catch {
@@ -148,6 +189,15 @@ export async function updateJobStatus(
     updatedAt: new Date().toISOString(),
     ...(status === 'completed' ? { completedAt: new Date().toISOString() } : {}),
   })
+
+  // Release escrowed funds to worker when job is completed
+  if (status === 'completed' && typeof window !== 'undefined') {
+    fetch('/api/payment/release', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jobId }),
+    }).catch(() => {})
+  }
 }
 
 // ─── CHAT ────────────────────────────────────────────────────────────────────
@@ -223,7 +273,51 @@ export async function markNotificationRead(notifId: string): Promise<void> {
 // ─── IMAGE UTILS (Cloudinary) ────────────────────────────────────────────────
 
 /**
+ * Compresses an image file using a canvas to reduce file size before upload.
+ * Targets ≤ 800px wide / tall and 0.82 JPEG quality — cuts a 6MB iPhone photo
+ * down to ~150KB while keeping it visually sharp on mobile screens.
+ */
+export async function compressImage(file: File, maxDim = 1200, quality = 0.82): Promise<File> {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    const url = URL.createObjectURL(file)
+    img.onload = () => {
+      URL.revokeObjectURL(url)
+      let { width, height } = img
+      if (width <= maxDim && height <= maxDim) {
+        // Already small enough — skip compression
+        resolve(file)
+        return
+      }
+      if (width > height) {
+        height = Math.round((height * maxDim) / width)
+        width = maxDim
+      } else {
+        width = Math.round((width * maxDim) / height)
+        height = maxDim
+      }
+      const canvas = document.createElement('canvas')
+      canvas.width = width
+      canvas.height = height
+      const ctx = canvas.getContext('2d')!
+      ctx.drawImage(img, 0, 0, width, height)
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) { reject(new Error('Compression failed')); return }
+          resolve(new File([blob], file.name.replace(/\.\w+$/, '.jpg'), { type: 'image/jpeg' }))
+        },
+        'image/jpeg',
+        quality
+      )
+    }
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Image load failed')) }
+    img.src = url
+  })
+}
+
+/**
  * Uploads a file to Cloudinary via unsigned upload and returns the secure URL.
+ * Automatically compresses large images before upload.
  * Set in .env.local:
  *   NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME   — your Cloudinary cloud name
  *   NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET — an unsigned upload preset
@@ -239,8 +333,11 @@ export async function uploadImage(file: File, _path: string): Promise<string> {
     )
   }
 
+  // Compress image before upload (saves Firebase Storage bandwidth + speeds 4G loads)
+  const compressed = await compressImage(file).catch(() => file)
+
   const formData = new FormData()
-  formData.append('file', file)
+  formData.append('file', compressed)
   formData.append('upload_preset', uploadPreset)
   // Use the first segment of _path as a Cloudinary folder (e.g. "avatars", "jobs", "chats")
   const folder = _path.split('/')[0]

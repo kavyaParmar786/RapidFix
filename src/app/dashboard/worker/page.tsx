@@ -45,8 +45,27 @@ export default function WorkerDashboard() {
 
   const toggleAvailability = async () => {
     setToggling(true)
-    await updateUserProfile({ isAvailable: !profile.isAvailable })
-    toast.success(profile.isAvailable ? 'You are now Offline' : 'You are now Online')
+    const goingOnline = !profile.isAvailable
+    const updates: Record<string, any> = { isAvailable: goingOnline }
+
+    // When going online, capture GPS so customers can sort by proximity
+    if (goingOnline && navigator.geolocation) {
+      await new Promise<void>((resolve) => {
+        navigator.geolocation.getCurrentPosition(
+          ({ coords }) => {
+            updates.lat = coords.latitude
+            updates.lng = coords.longitude
+            updates.locationUpdatedAt = new Date().toISOString()
+            resolve()
+          },
+          () => resolve(), // silently continue if user denies
+          { timeout: 5000, maximumAge: 60_000 }
+        )
+      })
+    }
+
+    await updateUserProfile(updates)
+    toast.success(goingOnline ? 'You are now Online 📍' : 'You are now Offline')
     setToggling(false)
   }
 
@@ -120,7 +139,7 @@ export default function WorkerDashboard() {
               </div>
 
               {tab === 'earnings' ? (
-                <EarningsTab />
+                <EarningsTab workerId={user?.uid || ''} />
               ) : (
               <div className="space-y-3">
                 {displayJobs.length === 0 ? (

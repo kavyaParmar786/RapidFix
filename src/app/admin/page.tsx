@@ -6,7 +6,7 @@ import { Users, Briefcase, TrendingUp, AlertTriangle, CheckCircle, XCircle, Cloc
 import Navbar from '@/components/layout/Navbar'
 import { cn } from '@/lib/utils'
 
-type AdminTab = 'overview' | 'workers' | 'jobs' | 'disputes'
+type AdminTab = 'overview' | 'workers' | 'jobs' | 'disputes' | 'promo'
 
 function Counter({ value, prefix = '' }: { value: number; prefix?: string }) {
   const [count, setCount] = useState(0)
@@ -45,6 +45,54 @@ export default function AdminDashboard() {
   const [workerFilter, setWorkerFilter] = useState<'all' | 'pending' | 'verified'>('all')
   const [workers, setWorkers] = useState(MOCK_WORKERS)
 
+  // Promo code state
+  const [promos, setPromos] = useState<any[]>([])
+  const [promoLoading, setPromoLoading] = useState(false)
+  const [promoForm, setPromoForm] = useState({ code: '', type: 'flat', value: '', maxUses: '', expiresAt: '', minOrderAmount: '', active: true })
+  const [promoSaving, setPromoSaving] = useState(false)
+
+  const loadPromos = async () => {
+    setPromoLoading(true)
+    try {
+      const res = await fetch('/api/promo')
+      const data = await res.json()
+      setPromos(data.codes || [])
+    } catch {}
+    finally { setPromoLoading(false) }
+  }
+
+  const savePromo = async () => {
+    if (!promoForm.code || !promoForm.value) return
+    setPromoSaving(true)
+    try {
+      const { addDoc, collection } = await import('firebase/firestore')
+      const { db } = await import('@/lib/firebase')
+      await addDoc(collection(db, 'promoCodes'), {
+        code: promoForm.code.toUpperCase().trim(),
+        type: promoForm.type,
+        value: Number(promoForm.value),
+        maxUses: promoForm.maxUses ? Number(promoForm.maxUses) : null,
+        minOrderAmount: promoForm.minOrderAmount ? Number(promoForm.minOrderAmount) : null,
+        expiresAt: promoForm.expiresAt || null,
+        usedCount: 0,
+        active: true,
+        createdAt: new Date().toISOString(),
+      })
+      setPromoForm({ code: '', type: 'flat', value: '', maxUses: '', expiresAt: '', minOrderAmount: '', active: true })
+      await loadPromos()
+    } catch (e) { console.error(e) }
+    finally { setPromoSaving(false) }
+  }
+
+  const togglePromo = async (id: string, active: boolean) => {
+    const { updateDoc, doc } = await import('firebase/firestore')
+    const { db } = await import('@/lib/firebase')
+    await updateDoc(doc(db, 'promoCodes', id), { active: !active })
+    setPromos(prev => prev.map(p => p.id === id ? { ...p, active: !active } : p))
+  }
+
+  useEffect(() => { if (tab === 'promo') loadPromos() }, [tab])
+
   const filteredWorkers = workers.filter(w => {
     const ms = w.name.toLowerCase().includes(search.toLowerCase()) || w.category.toLowerCase().includes(search.toLowerCase())
     const mf = workerFilter === 'all' || (workerFilter === 'pending' && !w.verified) || (workerFilter === 'verified' && w.verified)
@@ -58,6 +106,7 @@ export default function AdminDashboard() {
     { key: 'workers' as AdminTab, label: 'Workers', badge: pendingCount },
     { key: 'jobs' as AdminTab, label: 'Jobs' },
     { key: 'disputes' as AdminTab, label: 'Disputes', badge: MOCK_DISPUTES.length },
+    { key: 'promo' as AdminTab, label: 'Promo Codes' },
   ]
 
   const statCards = [
@@ -218,14 +267,37 @@ export default function AdminDashboard() {
                                 <div className="flex items-center gap-1.5">
                                   {!w.verified && (
                                     <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-                                      onClick={() => setWorkers(prev => prev.map(wk => wk.id === w.id ? { ...wk, verified: true } : wk))}
+                                      onClick={async () => {
+                                        try {
+                                          const { updateDoc, doc } = await import('firebase/firestore')
+                                          const { db } = await import('@/lib/firebase')
+                                          await updateDoc(doc(db, 'users', w.id), {
+                                            isVerified: true,
+                                            verifiedAt: new Date().toISOString(),
+                                          })
+                                          setWorkers(prev => prev.map(wk => wk.id === w.id ? { ...wk, verified: true } : wk))
+                                          toast.success(`${w.name} approved ✓`)
+                                        } catch { toast.error('Failed to approve') }
+                                      }}
                                       className="flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] font-semibold text-green-400"
                                       style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.2)' }}>
                                       <CheckCircle size={10} /> Approve
                                     </motion.button>
                                   )}
                                   <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
-                                    onClick={() => setWorkers(prev => prev.filter(wk => wk.id !== w.id))}
+                                    onClick={async () => {
+                                      try {
+                                        const { updateDoc, doc } = await import('firebase/firestore')
+                                        const { db } = await import('@/lib/firebase')
+                                        await updateDoc(doc(db, 'users', w.id), {
+                                          isVerified: false,
+                                          isAvailable: false,
+                                          adminNote: 'Removed by admin',
+                                        })
+                                        setWorkers(prev => prev.filter(wk => wk.id !== w.id))
+                                        toast.success('Worker removed')
+                                      } catch { toast.error('Failed to remove') }
+                                    }}
                                     className="flex items-center gap-1 rounded-lg px-2.5 py-1 text-[11px] text-red-400"
                                     style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.15)' }}>
                                     <Ban size={10} /> Remove
@@ -291,6 +363,83 @@ export default function AdminDashboard() {
                 </div>
               </motion.div>
             )}
+
+            {/* PROMO CODES */}
+            {tab === 'promo' && (
+              <motion.div key="promo" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-6">
+                <div className="glass-card p-6">
+                  <h2 className="font-semibold text-sm mb-4" style={{ color: 'var(--text-primary)' }}>Create Promo Code</h2>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
+                    <div>
+                      <label className="block text-xs mb-1" style={{ color: 'var(--text-muted)' }}>Code *</label>
+                      <input className="input-base font-mono tracking-wider uppercase" placeholder="SAVE100" value={promoForm.code} onChange={e => setPromoForm(p => ({ ...p, code: e.target.value.toUpperCase() }))} />
+                    </div>
+                    <div>
+                      <label className="block text-xs mb-1" style={{ color: 'var(--text-muted)' }}>Type</label>
+                      <select className="input-base" value={promoForm.type} onChange={e => setPromoForm(p => ({ ...p, type: e.target.value }))}>
+                        <option value="flat">Flat (₹)</option>
+                        <option value="percent">Percent (%)</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-xs mb-1" style={{ color: 'var(--text-muted)' }}>Value * {promoForm.type === 'percent' ? '(%)' : '(₹)'}</label>
+                      <input className="input-base" type="number" placeholder={promoForm.type === 'percent' ? '10' : '100'} value={promoForm.value} onChange={e => setPromoForm(p => ({ ...p, value: e.target.value }))} />
+                    </div>
+                    <div>
+                      <label className="block text-xs mb-1" style={{ color: 'var(--text-muted)' }}>Max uses</label>
+                      <input className="input-base" type="number" placeholder="Unlimited" value={promoForm.maxUses} onChange={e => setPromoForm(p => ({ ...p, maxUses: e.target.value }))} />
+                    </div>
+                    <div>
+                      <label className="block text-xs mb-1" style={{ color: 'var(--text-muted)' }}>Min order (₹)</label>
+                      <input className="input-base" type="number" placeholder="None" value={promoForm.minOrderAmount} onChange={e => setPromoForm(p => ({ ...p, minOrderAmount: e.target.value }))} />
+                    </div>
+                    <div>
+                      <label className="block text-xs mb-1" style={{ color: 'var(--text-muted)' }}>Expires at</label>
+                      <input className="input-base" type="date" value={promoForm.expiresAt} onChange={e => setPromoForm(p => ({ ...p, expiresAt: e.target.value }))} />
+                    </div>
+                  </div>
+                  <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }} onClick={savePromo}
+                    disabled={promoSaving || !promoForm.code || !promoForm.value}
+                    className="btn-primary px-6 py-2.5 text-sm rounded-xl disabled:opacity-50">
+                    {promoSaving ? 'Creating…' : '+ Create Code'}
+                  </motion.button>
+                </div>
+                <div className="glass-card overflow-hidden">
+                  <div className="px-5 py-4 border-b" style={{ borderColor: 'var(--border-subtle)' }}>
+                    <h2 className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>
+                      Codes <span className="ml-1 font-normal" style={{ color: 'var(--text-muted)' }}>({promos.length})</span>
+                    </h2>
+                  </div>
+                  {promoLoading ? (
+                    <div className="p-8 text-center text-sm" style={{ color: 'var(--text-muted)' }}>Loading…</div>
+                  ) : promos.length === 0 ? (
+                    <div className="p-8 text-center text-sm" style={{ color: 'var(--text-muted)' }}>No codes yet. Create one above.</div>
+                  ) : (
+                    <div className="divide-y" style={{ borderColor: 'var(--border-subtle)' }}>
+                      {promos.map((p, i) => (
+                        <motion.div key={p.id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.04 }}
+                          className="flex items-center justify-between px-5 py-3.5">
+                          <div>
+                            <span className="font-mono font-bold text-sm tracking-wider" style={{ color: 'var(--text-primary)' }}>{p.code}</span>
+                            <span className="ml-3 text-xs" style={{ color: 'var(--text-muted)' }}>
+                              {p.type === 'percent' ? `${p.value}% off` : `₹${p.value} off`}
+                              {p.minOrderAmount && ` · min ₹${p.minOrderAmount}`}
+                              {p.maxUses && ` · ${p.usedCount ?? 0}/${p.maxUses} used`}
+                              {p.expiresAt && ` · expires ${new Date(p.expiresAt).toLocaleDateString('en-IN')}`}
+                            </span>
+                          </div>
+                          <button onClick={() => togglePromo(p.id, p.active)}
+                            className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-all ${p.active ? 'bg-green-500/10 text-green-400 hover:bg-red-500/10 hover:text-red-400' : 'bg-red-500/10 text-red-400 hover:bg-green-500/10 hover:text-green-400'}`}>
+                            {p.active ? 'Active' : 'Disabled'}
+                          </button>
+                        </motion.div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
+
           </AnimatePresence>
         </div>
       </div>

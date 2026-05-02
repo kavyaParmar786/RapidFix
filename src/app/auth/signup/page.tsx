@@ -74,7 +74,19 @@ function SignupForm() {
     if (!agreedToTerms) { toast.error('Please accept the Terms & Privacy Policy'); return }
     if (password.length < 6) { toast.error('Password must be at least 6 characters'); return }
     setLoading(true)
-    try { await signUpWithEmail(email, password, name, role); setDone(true) }
+    try {
+      await signUpWithEmail(email, password, name, role, {
+        acceptedTermsAt: new Date().toISOString(),
+        referredBy: searchParams.get('ref') || undefined,
+      })
+      // Send welcome email (fire-and-forget — don't block the UI on this)
+      fetch('/api/email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'signup', to: email, name }),
+      }).catch(() => {})
+      setDone(true)
+    }
     catch (err: any) { toast.error(err.message || 'Sign-up failed') }
     finally { setLoading(false) }
   }

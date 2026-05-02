@@ -44,6 +44,10 @@ function PaymentContent() {
   const [method, setMethod] = useState('upi')
   const [upi, setUpi] = useState('')
   const [processing, setProcessing] = useState(false)
+  const [promoCode, setPromoCode] = useState('')
+  const [promoApplied, setPromoApplied] = useState<{ discount: number; message: string } | null>(null)
+  const [promoLoading, setPromoLoading] = useState(false)
+  const [promoError, setPromoError] = useState('')
 
   const amount = Number(searchParams.get('amount') || 500)
   const jobTitle = searchParams.get('job') || 'Home Service'
@@ -51,19 +55,95 @@ function PaymentContent() {
   const workerName = searchParams.get('worker') || 'Worker'
 
   const fee = Math.round(amount * 0.02)
-  const total = amount + fee
+  const discount = promoApplied?.discount ?? 0
+  const total = Math.max(0, amount + fee - discount)
+
+  const applyPromo = async () => {
+    if (!promoCode.trim()) return
+    setPromoLoading(true)
+    setPromoError('')
+    try {
+      const res = await fetch('/api/promo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: promoCode.trim(), amount: amount + fee, userId: user?.uid }),
+      })
+      const data = await res.json()
+      if (data.valid) {
+        setPromoApplied({ discount: data.discount, message: data.message })
+        setPromoError('')
+      } else {
+        setPromoError(data.error || 'Invalid code')
+        setPromoApplied(null)
+      }
+    } catch {
+      setPromoError('Could not validate code. Try again.')
+    } finally {
+      setPromoLoading(false)
+    }
+  }
+
+  const removePromo = () => {
+    setPromoApplied(null)
+    setPromoCode('')
+    setPromoError('')
+  }
 
   const handlePay = async () => {
     setProcessing(true)
-    // Razorpay integration point:
-    // const res = await fetch('/api/payment/create-order', { method: 'POST', body: JSON.stringify({ amount: total * 100, jobId }) })
-    // const order = await res.json()
-    // const rzp = new (window as any).Razorpay({ key: process.env.NEXT_PUBLIC_RAZORPAY_KEY, order_id: order.id, ... })
-    // rzp.open()
-    await new Promise(r => setTimeout(r, 2000))
-    setProcessing(false)
-    setStep('success')
-    toast.success('Payment successful! 🎉')
+    try {
+      // 1. Create order server-side
+      const res = await fetch('/api/payment/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: amount * 100, jobId }),  // base paise — server adds 2% fee
+      })
+      if (!res.ok) throw new Error('Could not create payment order')
+      const order = await res.json()
+
+      // 2. Load Razorpay checkout SDK
+      await new Promise<void>((resolve, reject) => {
+        if ((window as any).Razorpay) { resolve(); return }
+        const script = document.createElement('script')
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js'
+        script.onload = () => resolve()
+        script.onerror = () => reject(new Error('Razorpay SDK load failed'))
+        document.head.appendChild(script)
+      })
+
+      // 3. Open Razorpay checkout
+      await new Promise<void>((resolve, reject) => {
+        const rzp = new (window as any).Razorpay({
+          key: order.keyId,
+          amount: order.amount,
+          currency: order.currency,
+          order_id: order.orderId,
+          name: 'RapidFix',
+          description: jobTitle,
+          prefill: {
+            name: profile?.displayName || '',
+            email: user?.email || '',
+          },
+          theme: { color: '#6366f1' },
+          handler: () => {
+            setProcessing(false)
+            setStep('success')
+            toast.success('Payment successful! 🎉')
+            resolve()
+          },
+          modal: {
+            ondismiss: () => {
+              setProcessing(false)
+              reject(new Error('dismissed'))
+            },
+          },
+        })
+        rzp.open()
+      })
+    } catch (err: any) {
+      if (err?.message !== 'dismissed') toast.error(err?.message || 'Payment failed')
+      setProcessing(false)
+    }
   }
 
   const slideVariants = {
@@ -130,13 +210,54 @@ function PaymentContent() {
                     <span style={{ color: 'var(--text-muted)' }}>Platform fee (2%)</span>
                     <span style={{ color: 'var(--text-secondary)' }}>₹{fee}</span>
                   </div>
+                  {promoApplied && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-green-400">Promo discount</span>
+                      <span className="text-green-400 font-medium">−₹{promoApplied.discount}</span>
+                    </div>
+                  )}
                   <div className="h-px" style={{ background: 'var(--border-default)' }} />
                   <div className="flex justify-between text-base font-bold">
                     <span style={{ color: 'var(--text-primary)' }}>Total</span>
                     <motion.span
-                      initial={{ scale: 0.8 }} animate={{ scale: 1 }}
+                      key={total}
+                      initial={{ scale: 0.85 }} animate={{ scale: 1 }}
                       className="text-green-500">₹{total.toLocaleString()}</motion.span>
                   </div>
+                </div>
+
+                {/* Promo code */}
+                <div>
+                  <label className="block text-xs font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
+                    Promo / referral code
+                  </label>
+                  {promoApplied ? (
+                    <div className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm" style={{ background: 'rgba(34,197,94,0.08)', border: '1px solid rgba(34,197,94,0.3)' }}>
+                      <span className="text-green-400 flex-1 font-medium">{promoApplied.message}</span>
+                      <button onClick={removePromo} className="text-xs text-red-400 hover:text-red-300 transition-colors">Remove</button>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={promoCode}
+                        onChange={e => { setPromoCode(e.target.value.toUpperCase()); setPromoError('') }}
+                        onKeyDown={e => e.key === 'Enter' && applyPromo()}
+                        placeholder="Enter code"
+                        className="input-base flex-1 rounded-xl font-mono tracking-wider text-sm"
+                      />
+                      <motion.button
+                        whileTap={{ scale: 0.95 }}
+                        onClick={applyPromo}
+                        disabled={promoLoading || !promoCode.trim()}
+                        className="px-4 py-2.5 rounded-xl text-sm font-semibold transition-all disabled:opacity-50"
+                        style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)', border: '1px solid var(--border-default)' }}
+                      >
+                        {promoLoading ? '…' : 'Apply'}
+                      </motion.button>
+                    </div>
+                  )}
+                  {promoError && <p className="text-xs text-red-400 mt-1.5">{promoError}</p>}
                 </div>
 
                 {/* Trust badges */}

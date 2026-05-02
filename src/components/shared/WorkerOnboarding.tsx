@@ -1,8 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { User, Upload, ToggleRight, CheckCircle, ArrowRight, X, Camera } from 'lucide-react'
+import { User, Upload, ToggleRight, CheckCircle, ArrowRight, X, Camera, AlertCircle } from 'lucide-react'
+import { uploadImage } from '@/lib/firestore'
+import { updateUserProfile } from '@/lib/auth-context'
+import { useAuth } from '@/lib/auth-context'
+import toast from 'react-hot-toast'
 
 const STEPS = [
   { icon: User, title: 'Complete your profile', sub: 'Customers choose workers based on your profile' },
@@ -14,15 +18,89 @@ const CATEGORIES = ['Electrician', 'Plumber', 'Carpenter', 'Painter', 'AC Repair
 
 interface Props { onComplete: () => void }
 
+function DocUploadRow({
+  label, hint, uploaded, preview, uploading, onFile,
+}: {
+  label: string; hint: string; uploaded: boolean; preview: string | null; uploading: boolean; onFile: (f: File) => void
+}) {
+  const inputRef = useRef<HTMLInputElement>(null)
+  return (
+    <motion.div whileTap={{ scale: 0.98 }}
+      onClick={() => inputRef.current?.click()}
+      className="flex items-center gap-4 p-4 rounded-2xl cursor-pointer transition-all relative"
+      style={{
+        background: uploaded ? 'rgba(34,197,94,0.06)' : 'var(--bg-elevated)',
+        border: `1px solid ${uploaded ? 'rgba(34,197,94,0.3)' : 'var(--border-default)'}`,
+      }}>
+      <input ref={inputRef} type="file" accept="image/*" className="hidden"
+        onChange={e => { const f = e.target.files?.[0]; if (f) onFile(f) }} />
+      <div className="w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0" style={{ background: 'var(--bg-surface)' }}>
+        {preview ? (
+          <img src={preview} alt={label} className="w-10 h-10 object-cover rounded-xl" />
+        ) : uploading ? (
+          <motion.div className="w-4 h-4 rounded-full border-2 border-indigo-400/30 border-t-indigo-400"
+            animate={{ rotate: 360 }} transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }} />
+        ) : uploaded ? (
+          <CheckCircle size={18} className="text-green-400" />
+        ) : (
+          <Upload size={18} style={{ color: 'var(--text-muted)' }} />
+        )}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{label}</p>
+        <p className="text-xs truncate" style={{ color: 'var(--text-muted)' }}>
+          {uploading ? 'Uploading…' : uploaded ? 'Uploaded ✓' : hint}
+        </p>
+      </div>
+    </motion.div>
+  )
+}
+
 export default function WorkerOnboarding({ onComplete }: Props) {
+  const { user } = useAuth()
   const [step, setStep] = useState(0)
   const [bio, setBio] = useState('')
   const [category, setCategory] = useState('')
   const [experience, setExperience] = useState('')
-  const [aadhaarUploaded, setAadhaarUploaded] = useState(false)
-  const [selfieUploaded, setSelfieUploaded] = useState(false)
+
+  // Document upload state
+  const [aadhaarUrl, setAadhaarUrl] = useState('')
+  const [aadhaarPreview, setAadhaarPreview] = useState<string | null>(null)
+  const [aadhaarUploading, setAadhaarUploading] = useState(false)
+  const [selfieUrl, setSelfieUrl] = useState('')
+  const [selfiePreview, setSelfiePreview] = useState<string | null>(null)
+  const [selfieUploading, setSelfieUploading] = useState(false)
 
   const progress = ((step) / (STEPS.length - 1)) * 100
+
+  const handleDocUpload = async (
+    file: File,
+    setUrl: (u: string) => void,
+    setPreview: (u: string | null) => void,
+    setUploading: (b: boolean) => void,
+    docType: string,
+  ) => {
+    setPreview(URL.createObjectURL(file))
+    setUploading(true)
+    try {
+      const url = await uploadImage(file, `verification/${user?.uid}/${docType}`)
+      setUrl(url)
+      // Store doc URL in Firestore immediately
+      const { updateDoc, doc } = await import('firebase/firestore')
+      const { db } = await import('@/lib/firebase')
+      await updateDoc(doc(db, 'users', user!.uid), {
+        [`verificationDocs.${docType}`]: url,
+        verificationStatus: 'pending',
+        updatedAt: new Date().toISOString(),
+      })
+    } catch {
+      toast.error('Upload failed. Please try again.')
+      setPreview(null)
+      setUrl('')
+    } finally {
+      setUploading(false)
+    }
+  }
 
   return (
     <motion.div
@@ -128,40 +206,30 @@ export default function WorkerOnboarding({ onComplete }: Props) {
                 </p>
 
                 <div className="space-y-3">
-                  <motion.div
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => setAadhaarUploaded(true)}
-                    className="flex items-center gap-4 p-4 rounded-2xl cursor-pointer transition-all"
-                    style={{
-                      background: aadhaarUploaded ? 'rgba(34,197,94,0.06)' : 'var(--bg-elevated)',
-                      border: `1px solid ${aadhaarUploaded ? 'rgba(34,197,94,0.3)' : 'var(--border-default)'}`,
-                    }}>
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'var(--bg-surface)' }}>
-                      {aadhaarUploaded ? <CheckCircle size={18} className="text-green-400" /> : <Upload size={18} style={{ color: 'var(--text-muted)' }} />}
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Aadhaar Card</p>
-                      <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{aadhaarUploaded ? 'Uploaded ✓' : 'Front and back photo'}</p>
-                    </div>
-                  </motion.div>
-
-                  <motion.div
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => setSelfieUploaded(true)}
-                    className="flex items-center gap-4 p-4 rounded-2xl cursor-pointer transition-all"
-                    style={{
-                      background: selfieUploaded ? 'rgba(34,197,94,0.06)' : 'var(--bg-elevated)',
-                      border: `1px solid ${selfieUploaded ? 'rgba(34,197,94,0.3)' : 'var(--border-default)'}`,
-                    }}>
-                    <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'var(--bg-surface)' }}>
-                      {selfieUploaded ? <CheckCircle size={18} className="text-green-400" /> : <Camera size={18} style={{ color: 'var(--text-muted)' }} />}
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>Selfie</p>
-                      <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{selfieUploaded ? 'Uploaded ✓' : 'Clear photo of your face'}</p>
-                    </div>
-                  </motion.div>
+                  <DocUploadRow
+                    label="Aadhaar Card"
+                    hint="Front and back photo"
+                    uploaded={!!aadhaarUrl}
+                    preview={aadhaarPreview}
+                    uploading={aadhaarUploading}
+                    onFile={f => handleDocUpload(f, setAadhaarUrl, setAadhaarPreview, setAadhaarUploading, 'aadhaar')}
+                  />
+                  <DocUploadRow
+                    label="Selfie"
+                    hint="Clear photo of your face"
+                    uploaded={!!selfieUrl}
+                    preview={selfiePreview}
+                    uploading={selfieUploading}
+                    onFile={f => handleDocUpload(f, setSelfieUrl, setSelfiePreview, setSelfieUploading, 'selfie')}
+                  />
                 </div>
+
+                {(aadhaarUrl || selfieUrl) && !aadhaarUrl || !selfieUrl ? (
+                  <div className="flex items-center gap-2 mt-3 rounded-xl px-3 py-2 text-xs" style={{ background: 'rgba(251,191,36,0.08)', border: '1px solid rgba(251,191,36,0.2)' }}>
+                    <AlertCircle size={12} className="text-amber-400 flex-shrink-0" />
+                    <span style={{ color: 'var(--text-secondary)' }}>Upload both documents to continue. You can skip and do this later from your profile.</span>
+                  </div>
+                ) : null}
 
                 <p className="text-[10px] mt-4 text-center" style={{ color: 'var(--text-muted)' }}>
                   🔒 Your documents are encrypted and only reviewed by our trust team.
@@ -210,12 +278,21 @@ export default function WorkerOnboarding({ onComplete }: Props) {
               </button>
             )}
             {step < STEPS.length - 1 ? (
-              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-                onClick={() => setStep(s => s + 1)}
-                disabled={step === 0 && !category}
-                className="flex-1 btn-primary rounded-xl py-2.5 text-sm flex items-center justify-center gap-2">
-                Continue <ArrowRight size={13} />
-              </motion.button>
+              <div className="flex gap-2 flex-1">
+                {step === 1 && (
+                  <button onClick={() => setStep(s => s + 1)}
+                    className="px-4 py-2.5 rounded-xl text-xs font-medium transition-colors"
+                    style={{ color: 'var(--text-muted)', border: '1px solid var(--border-default)' }}>
+                    Skip for now
+                  </button>
+                )}
+                <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
+                  onClick={() => setStep(s => s + 1)}
+                  disabled={step === 0 && !category}
+                  className="flex-1 btn-primary rounded-xl py-2.5 text-sm flex items-center justify-center gap-2 disabled:opacity-50">
+                  {step === 1 && (aadhaarUrl || selfieUrl) ? 'Save & Continue' : 'Continue'} <ArrowRight size={13} />
+                </motion.button>
+              </div>
             ) : (
               <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
                 onClick={onComplete}

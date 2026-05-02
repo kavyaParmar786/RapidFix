@@ -2,10 +2,10 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { MapPin, Clock, DollarSign, Zap, CheckCircle } from 'lucide-react'
+import { MapPin, Clock, DollarSign, Zap, CheckCircle, Navigation } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { Job } from '@/types'
-import { cn, getCategoryConfig, STATUS_CONFIG, URGENCY_CONFIG, formatRelativeTime } from '@/lib/utils'
+import { cn, getCategoryConfig, STATUS_CONFIG, URGENCY_CONFIG, formatRelativeTime, haversineKm, formatDistance } from '@/lib/utils'
 
 interface JobCardProps {
   job: Job
@@ -13,11 +13,19 @@ interface JobCardProps {
   viewAs?: 'worker' | 'customer'
   onAccept?: (jobId: string) => void
   accepting?: boolean
+  workerLat?: number
+  workerLng?: number
 }
 
-export default function JobCard({ job, showAccept, viewAs, onAccept, accepting }: JobCardProps) {
+export default function JobCard({ job, showAccept, viewAs, onAccept, accepting, workerLat, workerLng }: JobCardProps) {
   const canAccept = showAccept || (viewAs === 'worker' && !!onAccept)
   const cat = getCategoryConfig(job.category)
+
+  const distanceStr = (workerLat && workerLng && job.locationLat && job.locationLng)
+    ? formatDistance(haversineKm(workerLat, workerLng, job.locationLat, job.locationLng))
+    : null
+
+  const isProWorker = (job as any).workerIsPro === true
   const status = STATUS_CONFIG[job.status]
   const urgency = URGENCY_CONFIG[job.urgency]
 
@@ -34,7 +42,15 @@ export default function JobCard({ job, showAccept, viewAs, onAccept, accepting }
             {cat.icon}
           </div>
           <div>
-            <h3 className="font-semibold leading-tight line-clamp-1" style={{ color: 'var(--text-primary)' }}>{job.title}</h3>
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className="font-semibold leading-tight line-clamp-1" style={{ color: 'var(--text-primary)' }}>{job.title}</h3>
+              {isProWorker && (
+                <span className="inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[9px] font-bold tracking-wide"
+                  style={{ background: 'linear-gradient(135deg,#f59e0b,#d97706)', color: '#fff' }}>
+                  ⭐ PRO
+                </span>
+              )}
+            </div>
             <p className="text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>{cat.label}</p>
           </div>
         </div>
@@ -77,6 +93,12 @@ export default function JobCard({ job, showAccept, viewAs, onAccept, accepting }
         <span className="flex items-center gap-1">
           <MapPin size={11} style={{ color: 'var(--text-muted)' }} />
           {job.location}
+          {distanceStr && (
+            <span className="ml-1 flex items-center gap-0.5 text-indigo-400 font-medium">
+              <Navigation size={9} />
+              {distanceStr}
+            </span>
+          )}
         </span>
         <span className="flex items-center gap-1">
           <Clock size={11} style={{ color: 'var(--text-muted)' }} />

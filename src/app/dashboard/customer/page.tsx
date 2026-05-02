@@ -122,16 +122,51 @@ export default function CustomerDashboard() {
 
               <div className="space-y-4">
                 {filteredJobs.length === 0 ? (
-                  <div className="glass-card p-12 text-center">
-                    <div className="text-4xl mb-3">📋</div>
-                    <p className="font-medium text-[var(--text-primary)] mb-1">No jobs yet</p>
-                    <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
-                      Post your first service request to get started
-                    </p>
-                    <Link href="/jobs/post" className="btn-primary inline-flex items-center gap-2">
-                      <Plus size={14} /> Post a Job
-                    </Link>
-                  </div>
+                  jobs.length === 0 ? (
+                    // First-time user — richer empty state
+                    <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+                      className="glass-card p-10 text-center">
+                      <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-3xl"
+                        style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.15), rgba(168,85,247,0.15))' }}>
+                        <span className="text-4xl">⚡</span>
+                      </div>
+                      <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
+                        Post your first job
+                      </h3>
+                      <p className="text-sm mb-1 max-w-xs mx-auto" style={{ color: 'var(--text-secondary)' }}>
+                        Get matched with a verified professional in minutes.
+                      </p>
+                      <p className="text-xs mb-6" style={{ color: 'var(--text-muted)' }}>
+                        Electrician · Plumber · Carpenter · Painter · and more
+                      </p>
+                      <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                        <Link href="/jobs/post" className="btn-primary inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl">
+                          <Plus size={14} /> Post a Job
+                        </Link>
+                        <Link href="/jobs/browse" className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-medium transition-colors"
+                          style={{ background: 'var(--bg-elevated)', color: 'var(--text-secondary)', border: '1px solid var(--border-default)' }}>
+                          Browse Services
+                        </Link>
+                      </div>
+                      <div className="mt-8 grid grid-cols-3 gap-3 text-center">
+                        {[['⚡', 'Instant match'], ['🔒', 'Background verified'], ['⭐', 'Rated 4.8/5']].map(([icon, label]) => (
+                          <div key={label} className="rounded-xl py-3 px-2" style={{ background: 'var(--bg-elevated)' }}>
+                            <div className="text-lg mb-1">{icon}</div>
+                            <p className="text-[10px] font-medium" style={{ color: 'var(--text-muted)' }}>{label}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  ) : (
+                    // Has jobs but filtered tab is empty
+                    <div className="glass-card p-10 text-center">
+                      <div className="text-3xl mb-3">🔍</div>
+                      <p className="font-medium mb-1" style={{ color: 'var(--text-primary)' }}>No {activeTab} jobs</p>
+                      <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                        Try a different filter or post a new job.
+                      </p>
+                    </div>
+                  )
                 ) : (
                   filteredJobs.map((job) => <JobCard key={job.id} job={job} />)
                 )}

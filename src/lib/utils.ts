@@ -58,3 +58,19 @@ export function formatRelativeTime(dateStr: string): string {
 export function getCategoryConfig(category: JobCategory) {
   return CATEGORIES.find((c) => c.value === category) ?? CATEGORIES[CATEGORIES.length - 1]
 }
+
+/** Haversine formula — returns distance in km between two lat/lng points */
+export function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371
+  const dLat = ((lat2 - lat1) * Math.PI) / 180
+  const dLng = ((lng2 - lng1) * Math.PI) / 180
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) ** 2
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+}
+
+/** Format km distance for display — "0.8 km" or "12 km" */
+export function formatDistance(km: number): string {
+  return km < 1 ? `${Math.round(km * 1000)} m` : `${km < 10 ? km.toFixed(1) : Math.round(km)} km`
+}

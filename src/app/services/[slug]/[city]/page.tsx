@@ -30,10 +30,22 @@ export async function generateMetadata({ params }: { params: { slug: string; cit
   const title = `Best ${service.label} in ${city.label} — RapidFix`
   const description = `Hire a verified ${service.label.toLowerCase()} in ${city.label}, ${city.state} for ${service.desc}. Get instant quotes, background-checked workers, starting at ${service.avgCost}.`
 
+  const ogImageUrl = `/api/og?service=${encodeURIComponent(service.label)}&city=${encodeURIComponent(city.label)}`
+
   return {
     title,
     description,
-    openGraph: { title, description },
+    openGraph: {
+      title,
+      description,
+      images: [{ url: ogImageUrl, width: 1200, height: 630, alt: title }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [ogImageUrl],
+    },
     alternates: { canonical: `/services/${params.slug}/${params.city}` },
     other: {
       'schema:json-ld': JSON.stringify({
