@@ -3,25 +3,30 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    function isAuth() { return request.auth != null; }
-    function isUser(uid) { return isAuth() && request.auth.uid == uid; }
-    function getUserData(uid) { return get(/databases/$(database)/documents/users/$(uid)).data; }
-    function isWorker() { return isAuth() && getUserData(request.auth.uid).role == 'worker'; }
-    function isCustomer() { return isAuth() && getUserData(request.auth.uid).role == 'customer'; }
-    function isAdmin() { return isAuth() && getUserData(request.auth.uid).role == 'admin'; }
+    // ── Helpers ──────────────────────────────────────────────────────────────
+    function isAuth()            { return request.auth != null; }
+    function isUser(uid)         { return isAuth() && request.auth.uid == uid; }
+    function myData()            { return get(/databases/$(database)/documents/users/$(request.auth.uid)).data; }
+    function isWorker()          { return isAuth() && myData().role == 'worker'; }
+    function isCustomer()        { return isAuth() && myData().role == 'customer'; }
+    function isAdmin()           { return isAuth() && myData().role == 'admin'; }
+    function isChatParty(chatId) {
+      let c = get(/databases/$(database)/documents/chats/$(chatId)).data;
+      return isAuth() && (request.auth.uid == c.customerId || request.auth.uid == c.workerId);
+    }
 
-    // Users — anyone auth can read; only own profile can write
+    // ── Users ─────────────────────────────────────────────────────────────────
     match /users/{uid} {
-      allow read: if isAuth();
+      allow read:   if isAuth();
       allow create: if isUser(uid);
       allow update: if isUser(uid) || isAdmin();
       allow delete: if isAdmin();
     }
 
-    // Jobs
+    // ── Jobs ──────────────────────────────────────────────────────────────────
     match /jobs/{jobId} {
       allow read: if isAuth();
-      allow create: if isCustomer()
+      allow create: if isAuth()
         && request.resource.data.customerId == request.auth.uid
         && request.resource.data.status == 'posted'
         && request.resource.data.title.size() > 0;
@@ -29,57 +34,111 @@ service cloud.firestore {
         || (isUser(resource.data.customerId) && resource.data.status in ['posted','accepted'])
         || (isWorker() && (
              (resource.data.status == 'posted' && request.resource.data.workerId == request.auth.uid)
-             || (resource.data.workerId == request.auth.uid && resource.data.status in ['accepted','in_progress'])
+             || (resource.data.workerId == request.auth.uid && resource.data.status in ['accepted','in_progress','completed'])
            ));
       allow delete: if isAdmin() || isUser(resource.data.customerId);
     }
 
-    // Chats
+    // ── Chats ─────────────────────────────────────────────────────────────────
     match /chats/{chatId} {
-      allow read: if isAuth() && (resource.data.customerId == request.auth.uid || resource.data.workerId == request.auth.uid || isAdmin());
-      allow create: if isAuth() && (request.resource.data.customerId == request.auth.uid || request.resource.data.workerId == request.auth.uid);
-      allow update: if isAuth() && (resource.data.customerId == request.auth.uid || resource.data.workerId == request.auth.uid);
+      allow read:   if isAuth() && (
+                      resource.data.customerId == request.auth.uid ||
+                      resource.data.workerId   == request.auth.uid ||
+                      isAdmin()
+                    );
+      allow create: if isAuth() && (
+                      request.resource.data.customerId == request.auth.uid ||
+                      request.resource.data.workerId   == request.auth.uid
+                    );
+      allow update: if isAuth() && (
+                      resource.data.customerId == request.auth.uid ||
+                      resource.data.workerId   == request.auth.uid
+                    );
+
+      // Messages
       match /messages/{messageId} {
-        allow read: if isAuth() && (get(/databases/$(database)/documents/chats/$(chatId)).data.customerId == request.auth.uid || get(/databases/$(database)/documents/chats/$(chatId)).data.workerId == request.auth.uid || isAdmin());
-        allow create: if isAuth() && request.resource.data.senderId == request.auth.uid;
-        allow update, delete: if false;
+        allow read:   if isChatParty(chatId) || isAdmin();
+        allow create: if isAuth()
+                        && isChatParty(chatId)
+                        && request.resource.data.senderId == request.auth.uid;
+        allow update: if isAuth()
+                        && isChatParty(chatId)
+                        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
+        allow delete: if false;
+      }
+
+      // Typing indicators — both parties in the chat can read/write
+      match /typing/{docId} {
+        allow read, write: if isChatParty(chatId);
       }
     }
 
-    // Reviews — authenticated users read; creator can create once
+    // ── Reviews ───────────────────────────────────────────────────────────────
     match /reviews/{reviewId} {
-      allow read: if isAuth();
-      allow create: if isAuth() && request.resource.data.reviewerId == request.auth.uid && request.resource.data.rating >= 1 && request.resource.data.rating <= 5;
+      allow read:   if isAuth();
+      allow create: if isAuth()
+                      && request.resource.data.reviewerId == request.auth.uid
+                      && request.resource.data.rating >= 1
+                      && request.resource.data.rating <= 5;
       allow update, delete: if isAdmin();
     }
 
-    // Notifications — only the recipient
+    // ── Notifications ─────────────────────────────────────────────────────────
     match /notifications/{notifId} {
       allow read, update, delete: if isAuth() && resource.data.userId == request.auth.uid;
       allow create: if isAuth();
     }
 
-    // Payments — server-side only (Cloud Functions), read by parties
+    // ── Payments — read by parties, write by server (API routes) ─────────────
     match /payments/{paymentId} {
-      allow read: if isAuth() && (resource.data.customerId == request.auth.uid || resource.data.workerId == request.auth.uid || isAdmin());
+      allow read: if isAuth() && (
+                    resource.data.customerId == request.auth.uid ||
+                    resource.data.workerId   == request.auth.uid ||
+                    isAdmin()
+                  );
       allow write: if isAdmin();
     }
 
-    // Promo codes — read for auth users, write admin only
+    // ── Payouts ───────────────────────────────────────────────────────────────
+    match /payouts/{payoutId} {
+      allow read: if isAuth() && (resource.data.workerId == request.auth.uid || isAdmin());
+      allow write: if isAdmin();
+    }
+
+    // ── Promo codes ───────────────────────────────────────────────────────────
     match /promoCodes/{codeId} {
-      allow read: if isAuth();
+      allow read:  if isAuth();
       allow write: if isAdmin();
     }
 
-    // Referrals
+    // ── Referrals ─────────────────────────────────────────────────────────────
     match /referrals/{referralId} {
-      allow read: if isAuth() && resource.data.userId == request.auth.uid;
-      allow create: if isAuth() && request.resource.data.userId == request.auth.uid;
+      // Referrer can read their own referrals
+      allow read:   if isAuth() && (
+                      resource.data.referrerId       == request.auth.uid ||
+                      resource.data.referredUserId   == request.auth.uid ||
+                      isAdmin()
+                    );
+      allow create: if isAuth();
       allow update: if isAdmin();
       allow delete: if false;
     }
 
-    // Block everything else
+    // ── Disputes ─────────────────────────────────────────────────────────────
+    match /disputes/{disputeId} {
+      allow read:   if isAuth() && (resource.data.reporterId == request.auth.uid || isAdmin());
+      allow create: if isAuth() && request.resource.data.reporterId == request.auth.uid;
+      allow update: if isAdmin();
+      allow delete: if false;
+    }
+
+    // ── Subscriptions (Razorpay Pro plan records) ─────────────────────────────
+    match /subscriptions/{subId} {
+      allow read:  if isAuth() && (resource.data.workerId == request.auth.uid || isAdmin());
+      allow write: if isAdmin();
+    }
+
+    // ── Block everything not explicitly covered ───────────────────────────────
     match /{document=**} {
       allow read, write: if false;
     }
