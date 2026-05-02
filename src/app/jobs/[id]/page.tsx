@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowLeft, MapPin, Clock, DollarSign, User, Zap, MessageCircle } from 'lucide-react'
+import { ArrowLeft, MapPin, Clock, DollarSign, User, Zap, MessageCircle, Share2 } from 'lucide-react'
 import { useAuth } from '@/lib/auth-context'
 import { getJob, updateJobStatus, acceptJob, createReview } from '@/lib/firestore'
 import { Job } from '@/types'
@@ -142,7 +142,7 @@ export default function JobDetailPage() {
               <div className="grid grid-cols-3 gap-3">
                 {job.images.map((img, i) => (
                   <div key={i} className="relative aspect-square overflow-hidden rounded-xl">
-                    <Image src={img} alt="" fill className="object-cover" />
+                    <Image src={img} alt="Job photo" fill className="object-cover" />
                   </div>
                 ))}
               </div>
@@ -155,7 +155,7 @@ export default function JobDetailPage() {
               <div className="flex items-center gap-3">
                 <div className="h-10 w-10 overflow-hidden rounded-full bg-zinc-900/30 flex items-center justify-center text-sm font-bold text-[var(--text-secondary)]">
                   {job.workerPhoto ? (
-                    <Image src={job.workerPhoto} alt="" width={40} height={40} className="object-cover rounded-full" />
+                    <Image src={job.workerPhoto} alt="Worker photo" width={40} height={40} className="object-cover rounded-full" />
                   ) : (
                     job.workerName?.[0]
                   )}
@@ -169,6 +169,20 @@ export default function JobDetailPage() {
                 <Link href={`/chat/${job.chatId}`} className="flex items-center gap-2 btn-secondary text-sm">
                   <MessageCircle size={14} /> Open Chat
                 </Link>
+                <button
+                  onClick={() => {
+                    const url = `${window.location.origin}/jobs/${job.id}`
+                    if (navigator.share) {
+                      navigator.share({ title: job.title, text: `Check out this job on RapidFix: ${job.title}`, url })
+                    } else {
+                      navigator.clipboard.writeText(url)
+                      toast.success('Link copied!')
+                    }
+                  }}
+                  className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium transition-all"
+                  style={{ background: 'var(--bg-elevated)', color: 'var(--text-secondary)', border: '1px solid var(--border-default)' }}>
+                  <Share2 size={12} /> Share
+                </button>
               )}
             </div>
           )}

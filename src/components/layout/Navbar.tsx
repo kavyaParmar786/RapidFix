@@ -365,7 +365,7 @@ export default function Navbar() {
                   className="flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 pl-1 pr-2.5 py-1 transition-all hover:bg-[var(--bg-base)]/15 hover:border-white/25">
                   <div className="h-6 w-6 rounded-full overflow-hidden bg-white/20 flex items-center justify-center shrink-0">
                     {profile.photoURL
-                      ? <Image src={profile.photoURL} alt="" width={24} height={24} className="object-cover" />
+                      ? <Image src={profile.photoURL} alt="Profile photo" width={24} height={24} className="object-cover" />
                       : <span className="text-[10px] font-bold text-white">{profile.displayName?.[0]?.toUpperCase()}</span>
                     }
                   </div>

@@ -169,7 +169,7 @@ export default function ChatPage() {
             <div className="relative">
               <div className="h-9 w-9 overflow-hidden rounded-full bg-zinc-900/30 flex items-center justify-center text-sm font-bold text-[var(--text-secondary)] flex-shrink-0">
                 {otherPhoto ? (
-                  <Image src={otherPhoto} alt="" width={36} height={36} className="object-cover rounded-full" />
+                  <Image src={otherPhoto} alt="Profile photo" width={36} height={36} className="object-cover rounded-full" />
                 ) : (
                   otherName?.[0]?.toUpperCase()
                 )}
@@ -224,7 +224,7 @@ export default function ChatPage() {
                       {!isMe && (
                         <div className="h-7 w-7 rounded-full bg-zinc-900/30 flex items-center justify-center text-xs font-bold text-[var(--text-secondary)] flex-shrink-0 self-end">
                           {msg.senderPhoto ? (
-                            <Image src={msg.senderPhoto} alt="" width={28} height={28} className="rounded-full object-cover" />
+                            <Image src={msg.senderPhoto} alt="Sender photo" width={28} height={28} className="rounded-full object-cover" />
                           ) : (
                             msg.senderName?.[0]?.toUpperCase()
                           )}
@@ -291,7 +291,7 @@ export default function ChatPage() {
           <div className="px-4 py-2 border-t border-black/10 flex items-center gap-2"
             style={{ background: 'rgba(15,20,32,0.95)' }}>
             <div className="relative h-14 w-14 overflow-hidden rounded-xl">
-              <Image src={imagePreview} alt="" fill className="object-cover" />
+              <Image src={imagePreview} alt="Image preview" fill className="object-cover" />
             </div>
             <p className="text-xs text-[var(--text-muted)] flex-1">{imageFile?.name}</p>
             <button onClick={() => { setImageFile(null); setImagePreview(null) }}

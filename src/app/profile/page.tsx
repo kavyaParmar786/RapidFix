@@ -109,7 +109,7 @@ export default function ProfilePage() {
               <div className="relative flex-shrink-0">
                 <div className="h-20 w-20 overflow-hidden rounded-2xl bg-zinc-900/30 flex items-center justify-center text-3xl font-bold text-[var(--text-secondary)]">
                   {profile.photoURL ? (
-                    <Image src={profile.photoURL} alt="" width={80} height={80} className="object-cover" />
+                    <Image src={profile.photoURL} alt="Profile photo" width={80} height={80} className="object-cover" />
                   ) : (
                     profile.displayName?.[0]?.toUpperCase()
                   )}

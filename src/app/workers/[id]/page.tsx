@@ -8,7 +8,6 @@ import { motion, useInView } from 'framer-motion'
 import { useRef } from 'react'
 import { Star, MapPin, Briefcase, CheckCircle, Shield, MessageCircle, ArrowLeft, Clock, AlertTriangle } from 'lucide-react'
 import Navbar from '@/components/layout/Navbar'
-import { PageLoader } from '@/components/ui/Spinner'
 import { getUserProfile, getWorkerReviews } from '@/lib/firestore'
 import { UserProfile } from '@/types'
 
@@ -66,7 +65,45 @@ export default function WorkerProfilePage() {
     load()
   }, [id])
 
-  if (loading) return <PageLoader />
+  if (loading) return (
+    <>
+      <Navbar />
+      <div className="min-h-screen pt-14" style={{ background: 'var(--bg-base)' }}>
+        <div className="mx-auto max-w-2xl px-4 py-8 space-y-4 animate-pulse">
+          {/* Hero card skeleton */}
+          <div className="glass-card p-6 flex gap-4">
+            <div className="h-20 w-20 rounded-2xl flex-shrink-0" style={{ background: 'var(--bg-elevated)' }} />
+            <div className="flex-1 space-y-2 pt-1">
+              <div className="h-4 w-36 rounded" style={{ background: 'var(--bg-elevated)' }} />
+              <div className="h-3 w-24 rounded" style={{ background: 'var(--bg-elevated)' }} />
+              <div className="h-3 w-20 rounded" style={{ background: 'var(--bg-elevated)' }} />
+            </div>
+          </div>
+          {/* Stats skeleton */}
+          <div className="grid grid-cols-3 gap-3">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="glass-card p-4 space-y-2">
+                <div className="h-5 w-12 rounded mx-auto" style={{ background: 'var(--bg-elevated)' }} />
+                <div className="h-3 w-16 rounded mx-auto" style={{ background: 'var(--bg-elevated)' }} />
+              </div>
+            ))}
+          </div>
+          {/* Reviews skeleton */}
+          <div className="glass-card p-5 space-y-3">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="flex gap-3">
+                <div className="h-7 w-7 rounded-full flex-shrink-0" style={{ background: 'var(--bg-elevated)' }} />
+                <div className="flex-1 space-y-1.5">
+                  <div className="h-3 w-24 rounded" style={{ background: 'var(--bg-elevated)' }} />
+                  <div className="h-3 w-full rounded" style={{ background: 'var(--bg-elevated)' }} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </>
+  )
 
   if (notFound || !worker) return (
     <>

@@ -99,7 +99,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </AuthProvider>
         </ThemeProvider>
 
-        {/* Google Analytics 4 — loads after page is interactive, no blocking */}
+        {/* Google Analytics 4 — only loads after cookie consent is given */}
         {GA_MEASUREMENT_ID && (
           <>
             <Script
@@ -111,7 +111,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 window.dataLayer = window.dataLayer || [];
                 function gtag(){dataLayer.push(arguments);}
                 gtag('js', new Date());
-                gtag('config', '${GA_MEASUREMENT_ID}', { page_path: window.location.pathname });
+                gtag('consent', 'default', { analytics_storage: 'denied' });
+                (function checkConsent() {
+                  var consent = localStorage.getItem('rf-cookie-consent');
+                  if (consent === 'accepted') {
+                    gtag('consent', 'update', { analytics_storage: 'granted' });
+                    gtag('config', '${GA_MEASUREMENT_ID}', { page_path: window.location.pathname, anonymize_ip: true });
+                  }
+                })();
               `}
             </Script>
           </>

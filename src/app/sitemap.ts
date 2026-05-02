@@ -31,6 +31,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE_URL}/jobs/browse`, changeFrequency: 'daily', priority: 0.8 },
     { url: `${BASE_URL}/privacy`, changeFrequency: 'yearly', priority: 0.3 },
     { url: `${BASE_URL}/terms`, changeFrequency: 'yearly', priority: 0.3 },
+    { url: `${BASE_URL}/refund-policy`, changeFrequency: 'yearly', priority: 0.3 },
   ]
 
   // Service landing pages (6 services)

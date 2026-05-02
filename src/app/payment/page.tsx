@@ -72,6 +72,7 @@ function PaymentContent() {
       if (data.valid) {
         setPromoApplied({ discount: data.discount, message: data.message })
         setPromoError('')
+        toast.success(`🎉 You saved ₹${data.discount}!`, { duration: 3000, style: { fontWeight: 600 } })
       } else {
         setPromoError(data.error || 'Invalid code')
         setPromoApplied(null)

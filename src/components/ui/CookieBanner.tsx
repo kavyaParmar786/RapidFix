@@ -13,7 +13,14 @@ export default function CookieBanner() {
     if (!consent) setTimeout(() => setVisible(true), 1500)
   }, [])
 
-  const accept = () => { localStorage.setItem('rf-cookie-consent', 'accepted'); setVisible(false) }
+  const accept = () => {
+    localStorage.setItem('rf-cookie-consent', 'accepted')
+    setVisible(false)
+    // Grant GA4 analytics consent immediately without page reload
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      ;(window as any).gtag('consent', 'update', { analytics_storage: 'granted' })
+    }
+  }
   const decline = () => { localStorage.setItem('rf-cookie-consent', 'declined'); setVisible(false) }
 
   return (

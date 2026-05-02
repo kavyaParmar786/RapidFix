@@ -7,12 +7,6 @@ import Navbar from '@/components/layout/Navbar'
 import { useAuth } from '@/lib/auth-context'
 import toast from 'react-hot-toast'
 
-const MOCK_REFERRALS = [
-  { name: 'Sneha M.', date: '2 days ago', status: 'signed_up', credit: 100 },
-  { name: 'Raj K.', date: '1 week ago', status: 'booked', credit: 100 },
-  { name: 'Arjun S.', date: '2 weeks ago', status: 'booked', credit: 100 },
-]
-
 function FloatingCredit({ amount }: { amount: number }) {
   return (
     <motion.div
@@ -30,13 +24,37 @@ export default function ReferralPage() {
   const { user, profile } = useAuth()
   const [copied, setCopied] = useState(false)
   const [showCredit, setShowCredit] = useState(false)
+  const [referrals, setReferrals] = useState<any[]>([])
+  const [creditBalance, setCreditBalance] = useState(0)
+  const [loadingReferrals, setLoadingReferrals] = useState(true)
 
   // Generate stable referral code from user ID
   const referralCode = user ? `RF${user.uid.slice(0, 6).toUpperCase()}` : 'RF------'
   const referralLink = `https://rapidfix.in/auth/signup?ref=${referralCode}`
 
-  const totalEarned = MOCK_REFERRALS.filter(r => r.status === 'booked').length * 100
-  const pendingCredit = MOCK_REFERRALS.filter(r => r.status === 'signed_up').length * 100
+  useEffect(() => {
+    if (!user) return
+    async function load() {
+      setLoadingReferrals(true)
+      try {
+        const { collection, query, where, getDocs, orderBy } = await import('firebase/firestore')
+        const { db } = await import('@/lib/firebase')
+        const snap = await getDocs(query(
+          collection(db, 'referrals'),
+          where('referrerId', '==', user.uid),
+          orderBy('createdAt', 'desc')
+        ))
+        const data = snap.docs.map(d => d.data())
+        setReferrals(data)
+        setCreditBalance((profile as any)?.referralCredits ?? 0)
+      } catch { /* silently ignore */ }
+      finally { setLoadingReferrals(false) }
+    }
+    load()
+  }, [user, profile])
+
+  const totalEarned = referrals.reduce((s, r) => s + (r.credit || 0), 0)
+  const pendingCredit = creditBalance
 
   const copyCode = async () => {
     await navigator.clipboard.writeText(referralCode)
@@ -92,7 +110,7 @@ export default function ReferralPage() {
           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
             className="grid grid-cols-3 gap-3 mb-6">
             {[
-              { icon: Users, label: 'Referred', value: MOCK_REFERRALS.length, color: 'text-blue-400' },
+              { icon: Users, label: 'Referred', value: referrals.length, color: 'text-blue-400' },
               { icon: IndianRupee, label: 'Earned', value: `₹${totalEarned}`, color: 'text-green-400' },
               { icon: Gift, label: 'Pending', value: `₹${pendingCredit}`, color: 'text-amber-400' },
             ].map(({ icon: Icon, label, value, color }, i) => (
@@ -169,32 +187,36 @@ export default function ReferralPage() {
           </motion.div>
 
           {/* Referral history */}
-          {MOCK_REFERRALS.length > 0 && (
+          {referrals.length > 0 && (
             <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}
               className="glass-card overflow-hidden">
               <div className="px-5 py-4 border-b" style={{ borderColor: 'var(--border-subtle)' }}>
                 <h2 className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>Your referrals</h2>
               </div>
               <div className="divide-y" style={{ borderColor: 'var(--border-subtle)' }}>
-                {MOCK_REFERRALS.map((r, i) => (
+                {referrals.map((r, i) => (
                   <motion.div key={i} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.4 + i * 0.06 }}
                     className="flex items-center justify-between px-5 py-3.5">
                     <div className="flex items-center gap-3">
                       <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
                         style={{ background: 'var(--bg-elevated)', color: 'var(--text-secondary)' }}>
-                        {r.name[0]}
+                        {r.referredUserId?.slice(0, 1).toUpperCase() ?? '?'}
                       </div>
                       <div>
-                        <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>{r.name}</p>
-                        <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{r.date}</p>
+                        <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>Friend joined</p>
+                        <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                          {r.createdAt ? new Date(r.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : ''}
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${r.status === 'booked' ? 'bg-green-500/12 text-green-400' : 'bg-amber-500/12 text-amber-400'}`}>
-                        {r.status === 'booked' ? 'Completed' : 'Signed up'}
+                      <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-green-500/12 text-green-400">
+                        ₹{r.credit || 100} credited
                       </span>
-                      {r.status === 'booked' && (
+                    </div>
+                  </motion.div>
+                ))}
                         <span className="text-sm font-bold text-green-400">+₹{r.credit}</span>
                       )}
                     </div>

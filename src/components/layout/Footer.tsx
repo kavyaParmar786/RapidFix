@@ -78,15 +78,43 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3"
+        {/* Cities we serve — creates internal links for SEO crawling */}
+        <div className="mt-12 pt-8" style={{ borderTop: '1px solid var(--border-subtle)' }}>
+          <p className="text-xs font-semibold mb-3" style={{ color: 'var(--text-muted)' }}>Cities we serve</p>
+          <div className="flex flex-wrap gap-x-4 gap-y-1.5">
+            {[
+              { city: 'rajkot', label: 'Rajkot' },
+              { city: 'ahmedabad', label: 'Ahmedabad' },
+              { city: 'surat', label: 'Surat' },
+              { city: 'vadodara', label: 'Vadodara' },
+              { city: 'jamnagar', label: 'Jamnagar' },
+              { city: 'gandhinagar', label: 'Gandhinagar' },
+              { city: 'junagadh', label: 'Junagadh' },
+              { city: 'bhavnagar', label: 'Bhavnagar' },
+            ].map(({ city, label }) => (
+              <Link key={city} href={`/services/electrician/${city}`}
+                className="text-[11px] transition-colors hover:text-[var(--text-primary)]"
+                style={{ color: 'var(--text-muted)' }}>
+                {label}
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-6 pt-5 flex flex-col sm:flex-row items-center justify-between gap-3"
           style={{ borderTop: '1px solid var(--border-subtle)' }}>
           <p className="text-[11px]" style={{ color: 'var(--text-muted)' }}>© {new Date().getFullYear()} RapidFix. All rights reserved.</p>
-          <div className="flex items-center gap-4">
-            {['Privacy Policy', 'Terms', 'Cookies'].map(l => (
-              <Link key={l} href={`/${l.toLowerCase().replace(' ','-')}`}
+          <div className="flex items-center gap-4 flex-wrap justify-center">
+            {[
+              { label: 'Privacy Policy', href: '/privacy' },
+              { label: 'Terms', href: '/terms' },
+              { label: 'Refund Policy', href: '/refund-policy' },
+              { label: 'Cookies', href: '/privacy#cookies' },
+            ].map(({ label, href }) => (
+              <Link key={label} href={href}
                 className="text-[11px] transition-colors"
                 style={{ color: 'var(--text-muted)' }}
-              >{l}</Link>
+              >{label}</Link>
             ))}
           </div>
         </div>

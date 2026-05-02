@@ -89,12 +89,49 @@ export default function WorkerDashboard() {
           {/* Header */}
           <div className="flex items-start sm:items-center justify-between gap-4 flex-wrap mb-8 pb-6 border-b border-black/[0.06]">
             <div>
-              <h1 className="text-xl font-bold text-[var(--text-primary)] mb-0.5">Worker Dashboard</h1>
+              <div className="flex items-center gap-2 mb-0.5">
+                <h1 className="text-xl font-bold text-[var(--text-primary)]">Worker Dashboard</h1>
+                {(profile as any).isPro && (
+                  <span className="inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wide"
+                    style={{ background: 'linear-gradient(135deg,#f59e0b,#d97706)', color: '#fff' }}>
+                    ⭐ PRO
+                  </span>
+                )}
+              </div>
               <p className="text-sm text-[var(--text-muted)]">
                 {profile.isAvailable ? 'You\'re Online — visible to customers' : 'You\'re Offline — toggle to receive jobs'}
               </p>
             </div>
             <div className="flex items-center gap-3">
+              {!(profile as any).isPro && (
+                <button
+                  onClick={async () => {
+                    try {
+                      const res = await fetch('/api/subscription', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ workerId: user?.uid }) })
+                      const data = await res.json()
+                      if (!data.subscriptionId) throw new Error(data.error || 'Failed')
+                      // Load Razorpay and open subscription checkout
+                      await new Promise<void>((resolve, reject) => {
+                        if ((window as any).Razorpay) { resolve(); return }
+                        const s = document.createElement('script'); s.src = 'https://checkout.razorpay.com/v1/checkout.js'
+                        s.onload = () => resolve(); s.onerror = () => reject(); document.head.appendChild(s)
+                      })
+                      const rzp = new (window as any).Razorpay({
+                        key: data.keyId || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+                        subscription_id: data.subscriptionId,
+                        name: 'RapidFix Pro',
+                        description: 'Priority listing · ⭐ Pro badge · ₹299/month',
+                        theme: { color: '#f59e0b' },
+                        handler: () => toast.success('Pro activated! 🎉'),
+                      })
+                      rzp.open()
+                    } catch { toast.error('Could not start subscription') }
+                  }}
+                  className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition-all"
+                  style={{ background: 'linear-gradient(135deg,rgba(245,158,11,0.15),rgba(217,119,6,0.1))', border: '1px solid rgba(245,158,11,0.3)', color: '#f59e0b' }}>
+                  ⭐ Go Pro — ₹299/mo
+                </button>
+              )}
               <Link href="/jobs/browse"
                 className="btn-ghost h-8 px-3 text-xs flex items-center gap-1.5">
                 <ExternalLink size={12} /> Browse Jobs

@@ -2,6 +2,18 @@ import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import Link from 'next/link'
 import { ArrowRight, CheckCircle, Clock, Shield, Star } from 'lucide-react'
+import { Metadata } from 'next'
+
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const svc = SERVICE_DATA[params.slug]
+  if (!svc) return { title: 'Service — RapidFix' }
+  return {
+    title: `${svc.title} Services — RapidFix`,
+    description: svc.description,
+    alternates: { canonical: `/services/${params.slug}` },
+    openGraph: { title: `${svc.title} Services — RapidFix`, description: svc.description },
+  }
+}
 
 const SERVICE_DATA: Record<string, {
   title: string; tagline: string; description: string; tasks: string[]; price: string

@@ -24,14 +24,6 @@ function Sparkline({ data, color }: { data: number[]; color: string }) {
   return <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`}><polyline fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" points={pts} /></svg>
 }
 
-const MOCK_WORKERS = [
-  { id: '1', name: 'Amit Patel', category: 'Electrician', rating: 4.8, jobs: 124, verified: true, joinedDays: 90 },
-  { id: '2', name: 'Rohit Shah', category: 'Plumber', rating: 4.5, jobs: 87, verified: true, joinedDays: 45 },
-  { id: '3', name: 'Priya Singh', category: 'Painter', rating: 4.9, jobs: 203, verified: true, joinedDays: 180 },
-  { id: '4', name: 'Suresh Kumar', category: 'Carpenter', rating: 0, jobs: 0, verified: false, joinedDays: 3 },
-  { id: '5', name: 'Meera Joshi', category: 'Cleaner', rating: 4.6, jobs: 56, verified: true, joinedDays: 60 },
-  { id: '6', name: 'Deepak Verma', category: 'AC Repair', rating: 0, jobs: 0, verified: false, joinedDays: 1 },
-]
 
 const MOCK_DISPUTES = [
   { id: 'd1', jobTitle: 'Fix AC unit', customer: 'Sneha M.', worker: 'Rohit S.', amount: 1800, reason: 'Work not completed properly', date: '2 hours ago' },
@@ -43,7 +35,32 @@ export default function AdminDashboard() {
   const [tab, setTab] = useState<AdminTab>('overview')
   const [search, setSearch] = useState('')
   const [workerFilter, setWorkerFilter] = useState<'all' | 'pending' | 'verified'>('all')
-  const [workers, setWorkers] = useState(MOCK_WORKERS)
+  const [workers, setWorkers] = useState<any[]>([])
+
+  useEffect(() => {
+    async function loadWorkers() {
+      try {
+        const { collection, query, where, getDocs, orderBy } = await import('firebase/firestore')
+        const { db } = await import('@/lib/firebase')
+        const snap = await getDocs(query(
+          collection(db, 'users'),
+          where('role', '==', 'worker'),
+          orderBy('createdAt', 'desc')
+        ))
+        setWorkers(snap.docs.map(d => ({
+          id: d.id,
+          name: d.data().displayName || 'Unnamed',
+          category: d.data().category || 'Unknown',
+          rating: d.data().rating || 0,
+          jobs: d.data().completedJobs || 0,
+          verified: d.data().isVerified || false,
+          joinedDays: Math.floor((Date.now() - new Date(d.data().createdAt).getTime()) / 86400000),
+          verificationDocs: d.data().verificationDocs || null,
+        })))
+      } catch (e) { console.error('Failed to load workers', e) }
+    }
+    loadWorkers()
+  }, [])
 
   // Promo code state
   const [promos, setPromos] = useState<any[]>([])

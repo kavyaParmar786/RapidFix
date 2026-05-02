@@ -26,6 +26,7 @@ export default function JobCard({ job, showAccept, viewAs, onAccept, accepting, 
     : null
 
   const isProWorker = (job as any).workerIsPro === true
+  const isVerifiedWorker = (job as any).workerIsVerified === true
   const status = STATUS_CONFIG[job.status]
   const urgency = URGENCY_CONFIG[job.urgency]
 
@@ -48,6 +49,11 @@ export default function JobCard({ job, showAccept, viewAs, onAccept, accepting, 
                 <span className="inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[9px] font-bold tracking-wide"
                   style={{ background: 'linear-gradient(135deg,#f59e0b,#d97706)', color: '#fff' }}>
                   ⭐ PRO
+                </span>
+              )}
+              {isVerifiedWorker && (
+                <span className="inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[9px] font-bold tracking-wide bg-green-500/15 text-green-500">
+                  ✓ Verified
                 </span>
               )}
             </div>
@@ -77,7 +83,7 @@ export default function JobCard({ job, showAccept, viewAs, onAccept, accepting, 
         <div className="flex gap-2 mb-4">
           {job.images.slice(0, 3).map((img, i) => (
             <div key={i} className="relative h-16 w-16 overflow-hidden rounded-lg" style={{ border: '1px solid var(--border-default)' }}>
-              <Image src={img} alt="" fill className="object-cover" />
+              <Image src={img} alt="Job photo" fill className="object-cover" />
               {i === 2 && job.images!.length > 3 && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/60 text-xs font-bold text-white">
                   +{job.images!.length - 3}
@@ -123,7 +129,7 @@ export default function JobCard({ job, showAccept, viewAs, onAccept, accepting, 
             style={{ background: 'var(--bg-elevated)' }}
           >
             {job.customerPhoto ? (
-              <Image src={job.customerPhoto} alt="" width={24} height={24} className="object-cover" />
+              <Image src={job.customerPhoto} alt="Customer photo" width={24} height={24} className="object-cover" />
             ) : (
               <span className="text-[10px] font-bold" style={{ color: 'var(--text-primary)' }}>
                 {job.customerName?.[0]?.toUpperCase()}

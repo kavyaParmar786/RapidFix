@@ -86,7 +86,30 @@ export default function CityServicePage({ params }: { params: { slug: string; ci
     { q: `Are RapidFix workers in ${city.label} verified?`, a: `Yes. Every worker undergoes Aadhaar verification, skill assessment, and background check before they're listed on the platform.` },
   ]
 
+  const serviceSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: `${service.label} in ${city.label}`,
+    description: `Hire verified ${service.label.toLowerCase()} professionals in ${city.label}. Fast booking, transparent pricing, background-checked workers.`,
+    provider: { '@type': 'LocalBusiness', name: 'RapidFix', url: 'https://rapidfix.in' },
+    areaServed: { '@type': 'City', name: city.label },
+    aggregateRating: { '@type': 'AggregateRating', ratingValue: '4.8', reviewCount: '500', bestRating: '5' },
+  }
+
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map(f => ({
+      '@type': 'Question',
+      name: f.q,
+      acceptedAnswer: { '@type': 'Answer', text: f.a },
+    })),
+  }
+
   return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
     <div className="min-h-screen" style={{ background: 'var(--bg-base)' }}>
       {/* Hero */}
       <section className="px-4 py-16 text-center" style={{ background: 'var(--bg-surface)', borderBottom: '1px solid var(--border-subtle)' }}>
@@ -172,5 +195,6 @@ export default function CityServicePage({ params }: { params: { slug: string; ci
         </div>
       </section>
     </div>
+    </>
   )
 }
